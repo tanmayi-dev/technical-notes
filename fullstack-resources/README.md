@@ -1,4 +1,4 @@
-<h1 align="center">FullStack Web Development Learning Resources</h1>
+# Web Development Learning Resources
 
 
 ### CSS

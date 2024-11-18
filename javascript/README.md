@@ -1,4 +1,4 @@
-# JAVASCRIPT : GUESS THE OUTPUT
+# Javascript : Guess the Output
 
 #### Question
 

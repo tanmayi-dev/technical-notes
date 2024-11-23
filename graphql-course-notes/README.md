@@ -1,3 +1,5 @@
+# GraphQL Course Notes
+
 - [Apollo Graph Associate]
   - Lift-off I: Basics
   - Lift-off II: Resolvers

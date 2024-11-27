@@ -11,7 +11,7 @@
    
 ### 1. Create a course roster using functions <a id="p1"></a>
 
-[solution](./01-create-a-roster-with-functions.js)
+[solution](https://github.com/tanmayi-dev/digital-garden/blob/main/javascript/object-oriented-programming/practice-challenges/01-create-a-roster-with-functions.js)
 
 Create a `Student` object and a `CourseRoster` object, and use their prototype settings to create `getRoster()` and `returnGraduatingStudents()` object functions. The output of these object functions is described below/
 

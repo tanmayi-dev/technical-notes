@@ -1,4 +1,4 @@
-# JS Basic Practice Challenges
+# JS OOPs Practice Challenges
 
 #### Index
 

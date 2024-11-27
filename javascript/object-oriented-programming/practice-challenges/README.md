@@ -11,7 +11,7 @@
    
 ### 1. Create a course roster using functions <a id="p1"></a>
 
-[solution](https://github.com/tanmayi-dev/digital-garden/blob/main/javascript/object-oriented-programming/practice-challenges/01-create-a-roster-with-functions.js)
+- [Code](https://github.com/tanmayi-dev/javascript-notes/blob/main/object-oriented-programming/practice-challenges/01-create-a-roster-with-functions.js)
 
 Create a `Student` object and a `CourseRoster` object, and use their prototype settings to create `getRoster()` and `returnGraduatingStudents()` object functions. The output of these object functions is described below/
 
@@ -71,7 +71,7 @@ CourseRoster {
 
 ### 2. Create a Book object with functions <a id="p2"></a>
 
-[solution](./02-create-a-book-object-with-functions.js)
+- [Code](https://github.com/tanmayi-dev/javascript-notes/blob/main/object-oriented-programming/practice-challenges/02-create-a-book-object-with-functions.js)
 
 We can use the `Object.defineProperty()` method to define a new property directly on an object. This method takes the object where the property is defined, the property name we want to define, and a descriptor of the property we're defining.
 
@@ -161,7 +161,7 @@ Result :
 
 ### 3. Create a Country with Classes <a id="p3"></a>
 
-[solution](./03-create-a-country-with-classes.js)
+- [Code](https://github.com/tanmayi-dev/javascript-notes/blob/main/object-oriented-programming/practice-challenges/03-create-a-country-with-classes.js)
 
 JavaScript class syntax is a method of creating objects, built on prototypes. Classes use a constructor function which is a special way to initialize objects. Classes can also contain functions that both modify and return data as in this example:
 
@@ -234,6 +234,8 @@ Country {
 
 ### 4. Create a Food Ordering Class <a id="p4"></a>
 
+- [Code](https://github.com/tanmayi-dev/javascript-notes/blob/main/object-oriented-programming/practice-challenges/04-create-a-food-ordering-class.js)
+  
 JavaSciprt's `get` syntax allows us to bind a property of an object to a function that will be called when we attempt to liik up its value. This is extremely useful when we want to access a dynamically computed property.
 
 For example, if we have a `Person` object, and it contains a value called `salary`, that contains the value of their annual salary in US dollars, but we want to be able to access their salary in Euro, we could use a `get` function to do compute this conversion as in this example:
@@ -329,6 +331,8 @@ Order {
 --- 
 
 ### 5. Create User and Admin Classes <a id="p5"></a>
+
+- [Code](https://github.com/tanmayi-dev/javascript-notes/blob/main/object-oriented-programming/practice-challenges/05-create-user-and-admin-classes.js)
 
 Use private properties to hide certain values and prevent them from being directly accessed. Private properties can only be accessed from inside the class declaration.
 

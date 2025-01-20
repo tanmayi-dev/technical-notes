@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./material3.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <section class="left">
+      <nav class="navigation">
+        <p>Components</p>
+        <li><a class="css-m3-link" href="#alerts">Alerts</a></li>
+        <li><a class="css-m3-link" href="#buttons">Buttons</a></li>
+        <li><a class="css-m3-link" href="#cards">Cards</a></li>
+        <li><a class="css-m3-link" href="#forms">Forms</a></li>
+        <li><a class="css-m3-link" href="#nav">Navigation Menus</a></li>
+        <li><a class="css-m3-link" href="#typography">Typography</a></li>
+      </nav>
+    </section>
+    <section class="right">
+      <section id="alerts" class="alerts-section">
+        <h5>Alerts/Notifications</h5>
+        <br />
+        <div>
+          <h6>Default Alerts</h6>
+          <br />
+          <div class="alert alert-info" role="alert">
+            This is an info alert with <a href="#">an example link</a>. Give it
+            a click if you like.
+          </div>
+          <div class="alert alert-error" role="alert">
+            This is an error alert with <a href="#">an example link</a>. Give it
+            a click if you like.
+          </div>
+          <div class="alert alert-warning" role="alert">
+            This is an warning alert with <a href="#">an example link</a>. Give
+            it a click if you like.
+          </div>
+          <div class="alert alert-success" role="alert">
+            This is an success alert with <a href="#">an example link</a>. Give
+            it a click if you like.
+          </div>
+        </div>
+        <br />
+        <div>
+          <h6>Dismissable Alerts</h6>
+          <br />
+          <div class="alert-dismissable alert-info" role="alert">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+            <button class="close-btn">&#x2715;</button>
+          </div>
+          <div class="alert-dismissable alert-error" role="alert">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+            <button class="close-btn">&#x2715;</button>
+          </div>
+          <div class="alert-dismissable alert-warning" role="alert">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+            <button class="close-btn">&#x2715;</button>
+          </div>
+          <div class="alert-dismissable alert-success" role="alert">
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+            eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim
+            ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            aliquip ex ea commodo consequat.
+            <button class="close-btn">&#x2715;</button>
+          </div>
+        </div>
+      </section>
+      <br />
+
+      <section id="buttons" class="buttons-section">
+        <h5>Buttons</h5>
+        <br />
+        <div>
+          <h6>Filled Buttons</h6>
+          <br />
+          <button class="btn btn-filled">Enabled</button>
+          <button class="btn btn-filled btn-filled-hovered">Hovered</button>
+          <button class="btn btn-filled btn-filled-focussed">Focused</button>
+          <button class="btn btn-filled btn-filled-pressed">Pressed</button>
+          <button class="btn btn-filled" disabled>Disabled</button>
+        </div>
+        <br />
+        <div>
+          <h6>Outlined Buttons</h6>
+          <br />
+          <button class="btn btn-outlined">Enabled</button>
+          <button class="btn btn-outlined btn-outlined-hovered">Hovered</button>
+          <button class="btn btn-outlined btn-outlined-focussed">
+            Focused
+          </button>
+          <button class="btn btn-outlined btn-outlined-pressed">Pressed</button>
+          <button class="btn btn-outlined" disabled>Disabled</button>
+        </div>
+        <br />
+        <div>
+          <h6>Text Buttons</h6>
+          <br />
+          <button class="btn btn-text">Enabled</button>
+          <button class="btn btn-text btn-text-hovered">Hovered</button>
+          <button class="btn btn-text btn-text-focussed">Focused</button>
+          <button class="btn btn-text btn-text-pressed">Pressed</button>
+          <button class="btn btn-text" disabled>Disabled</button>
+        </div>
+        <br />
+        <div>
+          <h6>Elevated Buttons</h6>
+          <br />
+          <button class="btn btn-elevated">Enabled</button>
+          <button class="btn btn-elevated btn-elevated-hovered">Hovered</button>
+          <button class="btn btn-elevated btn-elevated-focussed">
+            Focused
+          </button>
+          <button class="btn btn-elevated btn-elevated-pressed">Pressed</button>
+          <button class="btn btn-elevated" disabled>Disabled</button>
+        </div>
+        <br />
+        <div>
+          <h6>Tonal Buttons</h6>
+          <br />
+          <button class="btn btn-tonal">Enabled</button>
+          <button class="btn btn-tonal btn-tonal-hovered">Hovered</button>
+          <button class="btn btn-tonal btn-tonal-focussed">Focused</button>
+          <button class="btn btn-tonal btn-tonal-pressed">Pressed</button>
+          <button class="btn btn-tonal" disabled>Disabled</button>
+        </div>
+      </section>
+      <br />
+
+      <section id="cards" class="cards-section">
+        <h5>Cards</h5>
+        <br />
+        <h6>Large Cards</h6>
+        <br />
+        <div class="full-cards">
+          <div class="card card-outline">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media.png" alt="card image" />
+            </div>
+            <div class="card-body">
+              <div class="card-title">Title</div>
+              <div class="card-subtitle">Subtitle</div>
+              <div class="card-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outlined">Enabled</button>
+              <button class="btn btn-filled">Enabled</button>
+            </div>
+          </div>
+          <br />
+
+          <div class="card card-elevated">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media.png" alt="card image" />
+            </div>
+            <div class="card-body">
+              <div class="card-title">Title</div>
+              <div class="card-subtitle">Subtitle</div>
+              <div class="card-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outlined">Enabled</button>
+              <button class="btn btn-filled">Enabled</button>
+            </div>
+          </div>
+          <br />
+
+          <div class="card card-tonal">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media.png" alt="card image" />
+            </div>
+            <div class="card-body">
+              <div class="card-title">Title</div>
+              <div class="card-subtitle">Subtitle</div>
+              <div class="card-text">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+                eiusmod tempor
+              </div>
+            </div>
+            <div class="card-footer">
+              <button class="btn btn-outlined">Enabled</button>
+              <button class="btn btn-filled">Enabled</button>
+            </div>
+          </div>
+        </div>
+        <br />
+
+        <h6>Small Cards</h6>
+        <br />
+
+        <div class="small-cards">
+          <div class="card-small card-outline">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media-mini.png" alt="mini card image" />
+            </div>
+          </div>
+
+          <br />
+
+          <div class="card-small card-elevated">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media-mini.png" alt="mini card image" />
+            </div>
+          </div>
+
+          <br />
+
+          <div class="card-small card-tonal">
+            <div class="card-header">
+              <div class="card-profile-img">
+                <img src="./images/card-profile.png" alt="profile image" />
+              </div>
+              <div class="card-header-content">
+                <div class="title-medium">Header</div>
+                <div class="label-medium">Sub Heading</div>
+              </div>
+            </div>
+            <div class="card-img">
+              <img src="./images/media-mini.png" alt="mini card image" />
+            </div>
+          </div>
+
+          <br />
+        </div>
+
+        <br />
+      </section>
+      <br />
+
+      <section id="forms" class="forms-section">
+        <h5>Forms</h5>
+        <br />
+        <div class="m3-container">
+          <div class="form-card">
+            <form action="">
+              <div class="form-group">
+                <label class="form-label" for="email">Your Email</label>
+                <input
+                  class="form-control form-outline-input"
+                  type="email"
+                  id="email"
+                  placeholder="example@company.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input
+                  class="form-control form-outline-input"
+                  type="password"
+                  id="password"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password"
+                  >Confirm Password</label
+                >
+                <input
+                  class="form-control form-outline-input"
+                  type="password"
+                  id="password"
+                  placeholder="Confirm password"
+                  required
+                />
+              </div>
+
+              <div class="form-select">
+                <input class="radio-input" id="input" type="radio" />
+                <label class="radio-label" for="textarea"
+                  >I agree to the terms and conditions</label
+                >
+              </div>
+
+              <button class="btn btn-outlined">Sign Up</button>
+            </form>
+          </div>
+
+          <br />
+
+          <div class="form-card">
+            <form action="#">
+              <div class="form-group">
+                <label class="form-label" for="email">Your Email</label>
+                <input
+                  class="form-control form-tonal-input"
+                  type="email"
+                  id="email"
+                  placeholder="example@company.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input
+                  class="form-control form-tonal-input"
+                  type="password"
+                  id="password"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password"
+                  >Confirm Password</label
+                >
+                <input
+                  class="form-control form-tonal-input"
+                  type="password"
+                  id="password"
+                  placeholder="Confirm password"
+                  required
+                />
+              </div>
+
+              <div class="form-select">
+                <input class="radio-input" id="input" type="radio" />
+                <label class="radio-label" for="textarea"
+                  >I agree to the terms and conditions</label
+                >
+              </div>
+
+              <button class="btn btn-tonal">Sign Up</button>
+            </form>
+          </div>
+
+          <br />
+          <div class="form-card">
+            <form action="#">
+              <div class="form-group">
+                <label class="form-label" for="email">Your Email</label>
+                <input
+                  class="form-control form-elevated-input"
+                  type="email"
+                  id="email"
+                  placeholder="example@company.com"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password">Password</label>
+                <input
+                  class="form-control form-elevated-input"
+                  type="password"
+                  id="password"
+                  placeholder="Password"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label class="form-label" for="password"
+                  >Confirm Password</label
+                >
+                <input
+                  class="form-control form-elevated-input"
+                  type="password"
+                  id="password"
+                  placeholder="Confirm password"
+                  required
+                />
+              </div>
+
+              <div class="form-select">
+                <input class="radio-input" type="radio" id="radio" />
+                <label class="radio-label" for="textarea"
+                  >I agree to the terms and conditions</label
+                >
+              </div>
+
+              <button class="btn btn-elevated">Sign Up</button>
+            </form>
+          </div>
+
+          <br />
+        </div>
+      </section>
+      <br />
+
+      <section>
+        <!-- <h5>Inputs</h5>
+        <br />
+      
+        <div class="contact">
+          <label for="contact">Enter Phone Number</label>
+          <input
+            type="tel"
+            placeholder="123-45-6789"
+            pattern="[0-9]{3}-[0-9]{2}-[0-9]{4}"
+            id="contact"
+            name="contact"
+          />
+          <small>Format: 123-45-6789</small>
+        </div>
+
+        <div class="number">
+          <label for="number">Your Age</label>
+          <input
+            type="number"
+            id="number"
+            min="1"
+            max="100"
+            placeholder="24"
+          />
+        </div>
+
+        <div class="number-range">
+          <label for="quantity">Quantity</label>
+          <input
+            type="number"
+            id="quantity"
+            name="quantity"
+            min="0"
+            max="100"
+            step="10"
+            value="30"
+          />
+        </div>
+
+        <div class="radio">
+          <input type="radio" id="radio" />
+          <label for="radio">Remember me</label>
+        </div>
+
+        <div class="check">
+          <input type="checkbox" id="checkbox" />
+          <label for="checkbox">Remember me</label>
+        </div>
+        
+        <div class="select">
+          <label for="feelings">Choose your Mood :
+          </label>
+          <select name="feelings" id="feelings">
+            <option value="happy">Happy</option>
+            <option value="sad">Sad</option>
+            <option value="angry">Angry</option>
+            <option value="excited">Excited</option>
+          </select>
+        </div>
+
+        <div class="color">
+          <label for="color">Select Color : </label>
+          <input
+            type="color"
+            id="color"
+            name="color"
+            value="#6750a4"
+          />
+        </div>
+
+        <div class="calendar">
+          <label for="date">Select Date : </label>
+          <input
+            type="date"
+            id="date"
+            name="date"
+          />
+        </div>
+
+        <div class="time">
+          <label for="time">Select a Time : </label>
+          <input type="time" id="time" name="time" />
+        </div>
+
+        <div class="slider">
+          <label for="slider">Select Range : </label>
+          <input
+            type="range"
+            id="slider"
+            name="slider"
+            min="1"
+            max="100"
+            value="50"
+          />
+        </div>  -->
+      </section>
+
+      <br />
+
+      <section id="nav" class="nav-section">
+        <h5>Navigation Menus</h5>
+        <br />
+        <div class="horizontal-section">
+          <div>
+            <p>Horizontal Base Menu</p>
+            <br />
+            <nav class="nav">
+              <a class="nav-link active" href="#">Active</a>
+              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link disabled" href="#">Disabled</a>
+            </nav>
+            <br />
+            <!-- <nav class="nav justify-content-center">
+          <a class="nav-link active" href="#">Active</a>
+          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link disabled" href="#">Disabled</a>
+        </nav>
+        <br />
+        <nav class="nav justify-content-end">
+          <a class="nav-link active" href="#">Active</a>
+          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link" href="#">Link</a>
+          <a class="nav-link disabled" href="#">Disabled</a>
+        </nav> -->
+          </div>
+          <div>
+            <p>Horizontal Tonal Menu</p>
+            <br />
+            <nav class="nav nav-tonal">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Active</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+              </li>
+            </nav>
+            <br />
+          </div>
+          <div>
+            <p>Horizontal Filled Menu</p>
+            <br />
+            <nav class="nav nav-filled">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Active</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+              </li>
+            </nav>
+            <br />
+          </div>
+        </div>
+
+        <div class="vertical-section">
+          <div>
+            <p>Vertical Base Menu</p>
+            <br />
+            <nav class="nav nav-col align-items-start">
+              <a class="nav-link active" href="#">Active</a>
+              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link" href="#">Link</a>
+              <a class="nav-link disabled" href="#">Disabled</a>
+            </nav>
+            <br />
+          </div>
+
+          <div>
+            <p>Vertical Filled Menu</p>
+            <br />
+            <nav class="nav nav-filled nav-col align-items-start">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Active</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+              </li>
+            </nav>
+            <br />
+          </div>
+
+          <div>
+            <p>Vertical Tonal Menu</p>
+            <br />
+            <nav class="nav nav-tonal nav-col align-items-start">
+              <li class="nav-item">
+                <a class="nav-link active" href="#">Active</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="#">Link</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link disabled" href="#">Disabled</a>
+              </li>
+            </nav>
+            <br />
+          </div>
+        </div>
+      </section>
+      <br />
+
+      <section id="typography" class="typography-section">
+        <h5>Typography</h5>
+        <br />
+        <!-- <div>
+        <h5>Header Tags</h5>
+        <br />
+        <h1>Heading 1</h1>
+        <h2>Heading 2</h2>
+        <h3>Heading 3</h3>
+        <h4>Heading 4</h4>
+        <h5>Heading 5</h5>
+        <h6>Heading 6</h6>
+      </div> -->
+        <div>
+          <h6>Display</h6>
+          <br />
+          <p class="display-large">Display Large - Roboto</p>
+          <p class="display-medium">Display Medium - Roboto</p>
+          <p class="display-small">Display Small - Roboto</p>
+        </div>
+        <br />
+        <div>
+          <h6>Headlines</h6>
+          <br />
+          <p class="headline-large">Headline Large - Roboto</p>
+          <p class="headline-medium">Headline Medium - Roboto</p>
+          <p class="headline-small">Headline Small - Roboto</p>
+        </div>
+        <br />
+
+        <div>
+          <h6>Title</h6>
+          <br />
+          <p class="title-large">Title Large - Roboto</p>
+          <p class="title-medium">Title Medium - Roboto</p>
+          <p class="title-small">Title Small - Roboto</p>
+        </div>
+        <br />
+
+        <div>
+          <h6>Label</h6>
+          <br />
+          <p class="label-large">Label Large - Roboto</p>
+          <p class="label-medium">Label Medium - Roboto</p>
+          <p class="label-small">Label Small - Roboto</p>
+        </div>
+        <br />
+
+        <div>
+          <h6>Body</h6>
+          <br />
+          <p class="body-large">Body Large - Roboto</p>
+          <p class="body-medium">Body Medium - Roboto</p>
+          <p class="body-small">Body Small - Roboto</p>
+        </div>
+      </section>
+    </section>
+  </body>
+</html>

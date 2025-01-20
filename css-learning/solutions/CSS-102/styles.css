@@ -1,0 +1,364 @@
+:root {
+  --primary-text-color: #ffffff;
+  --list-white: #a3a3a3;
+  --text-white: #e5e5e5;
+  --button-border-grey: #262626;
+  --button-hover-grey: #171717;
+  --color-1: #131313;
+  --color-2: #262626;
+  --color-3: #b2b2b2;
+  --color-4: #181818;
+  --blur: blur(120px);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+  background-attachment: fixed;
+  color: var(--primary-text-color);
+  background-color: #111111;
+  font-family: "Mulish", sans-serif;
+
+  background: rgb(17, 17, 17);
+  background: rgb(11, 11, 11);
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 1) 5%,
+      rgba(0, 0, 0, 0.8) 19%,
+      rgba(56, 55, 55, 0.7) 64%,
+      rgba(88, 84, 84, 0.5) 100%
+    ),
+    url(./assets/hero2.jpg);
+}
+
+header {
+  background: rgb(17, 17, 17);
+  background: rgb(11, 11, 11);
+  background: rgb(0, 0, 0);
+  background: linear-gradient(
+      0deg,
+      rgba(0, 0, 0, 1) 5%,
+      rgba(0, 0, 0, 0.8) 19%,
+      rgba(56, 55, 55, 0.7) 64%,
+      rgba(88, 84, 84, 0.5) 100%
+    ),
+    url(./assets/hero2.jpg);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+header,
+section {
+  min-height: 100vh;
+  max-height: max-content;
+  overflow-y: auto;
+}
+
+h1 {
+  color: white;
+}
+
+section:nth-child(2n) {
+  background-color: black;
+}
+
+section {
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.flex-justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+.flex-align-items-center {
+  align-items: center;
+}
+
+.hero {
+  flex-direction: column;
+  align-items: center;
+}
+
+.btn {
+  padding: 1rem 1.4rem;
+  border-radius: 2rem;
+  border: solid 1px #777777;
+  background-color: #111111;
+  font-weight: bold;
+}
+
+.btn:hover {
+  background-color: #d9d9d9;
+  color: black;
+  font-weight: bold;
+}
+
+.about > p {
+  max-width: 60rem;
+  text-align: left;
+}
+
+.about-content {
+  gap: 1rem;
+  max-width: 50rem;
+}
+
+.about-content p {
+  color: var(--list-white);
+}
+
+.about-content li {
+  list-style: circle;
+  color: var(--list-white);
+  line-height: 2rem;
+}
+
+.glass-panel {
+  color: #fff;
+  margin: 3rem auto;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 100%;
+  border-radius: 1rem;
+  padding: 2rem;
+  backdrop-filter: blur(10px);
+}
+
+.about-content article {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.about-content-divider {
+  border: 1px solid var(--list-white);
+  margin: 0 1rem 0 1rem;
+}
+
+section.crafts article {
+  gap: 24px;
+  margin-top: 24px;
+}
+
+section.crafts img {
+  height: 200px;
+}
+
+/* Crafts Section*/
+
+.crafts .project-left {
+  display: flex;
+  flex-direction: row;
+  border: 1px solid var(--button-border-grey);
+  border-radius: 5px;
+  align-items: center;
+  width: 50rem;
+  margin-bottom: 0.5rem;
+  justify-content: space-around;
+}
+
+.crafts .project-left img {
+  margin: 0rem 1rem;
+  border-radius: 5px;
+}
+
+.crafts .project-content {
+  margin: 1rem 1rem;
+}
+
+.crafts .project-content h3 {
+  font-size: 1.1rem;
+  font-weight: 400;
+}
+
+.crafts .project-content p {
+  font-size: 0.9rem;
+  color: var(--list-white);
+}
+
+.crafts .project-content ul.tech {
+  display: flex;
+  flex-wrap: wrap;
+  list-style: none;
+  padding-left: 0;
+  font-family: "Inconsolata", sans-serif;
+  font-size: 0.9rem;
+  color: var(--text-white);
+}
+
+.crafts .project-content ul > li {
+  margin: 0.5rem 0.5rem 0 0;
+  border-radius: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: black;
+}
+
+.crafts .btn-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  margin-right: 1rem;
+}
+
+.crafts .btn-group button {
+  color: var(--primary-text-color);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
+  font-size: 0.9rem;
+  font-family: "Segoe UI Symbol", sans-serif;
+  font-weight: 500;
+  margin-right: 0.1rem;
+  padding: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(2px);
+}
+
+.crafts .btn-group button:hover {
+  background-color: var(--button-hover-grey);
+  cursor: pointer;
+}
+
+.crafts .btn-group button i {
+  margin-right: 0.4rem;
+}
+
+.experience p {
+  color: var(--list-white);
+}
+
+.experience-card ul li {
+  list-style-type: none;
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-left: 2px solid var(--button-border-grey);
+}
+
+.experience-card ul li:hover {
+  border-radius: 1rem;
+  background-color: var(--button-border-grey);
+}
+
+section.contact {
+  margin-top: 2rem;
+}
+
+.contact ul {
+  padding: 0;
+  margin: 1rem;
+  display: flex;
+  justify-content: space-between;
+}
+
+.contact-card {
+  margin: 1rem;
+}
+
+.contact ul > li {
+  display: inline-block;
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  backdrop-filter: blur(10px);
+  line-height: 1.5rem;
+}
+
+.contact ul > li i {
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+}
+
+.contact .article-container {
+  display: flex;
+  width: 40rem;
+}
+
+.contact article {
+  margin: 1rem;
+}
+
+/* Gradient Background */
+
+/* .gradient-container {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  background: var(--color-2);
+  flex-wrap: wrap;
+  overflow: hidden;
+  position: relative;
+}
+
+.gradient-color {
+  width: 50%;
+  height: 50%;
+  display: flex;
+  border-radius: 30% 80% 75% 40% / 40% 40% 70% 50%;
+  animation-name: animate;
+  animation-duration: 5s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+  animation-direction: alternate;
+}
+
+@keyframes animate {
+  0% {
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 60%;
+    transform: scale(2) rotate(0deg) translate(10%, 10%);
+  }
+  100% {
+    border-radius: 88% 10% 22% 58% / 73% 56% 34% 77%;
+    transform: scale(2) rotate(180deg) translate(10%, -10%);
+  }
+}
+
+.gradient-color:nth-child(1) {
+  background-color: var(--color-1);
+  animation-direction: backwards;
+}
+
+.gradient-color:nth-child(2) {
+  background-color: var(--color-2);
+}
+
+.gradient-color:nth-child(3) {
+  background-color: var(--color-3);
+  animation-direction: backwards;
+}
+
+.gradient-color:nth-child(4) {
+  background-color: var(--color-4);
+}
+
+.gradient-backdrop {
+  width: 100%;
+  height: 100%;
+  display: block;
+  position: absolute;
+  left: 0;
+  top: 0;
+  background: transparent;
+  backdrop-filter: var(--blur);
+} */

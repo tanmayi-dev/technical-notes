@@ -1,0 +1,119 @@
+body {
+  display: flex;
+}
+.left {
+  width: 15%;
+  border-right: 1px solid grey;
+}
+
+.navigation {
+  display: flex;
+  flex-direction: column;
+  padding: 0rem 2rem 0rem 1rem;
+  align-items: flex-start;
+  position: fixed;
+  height: 100vh;
+}
+
+.navigation > p {
+  font-size: 1.2rem;
+  padding-bottom: 0.5rem;
+  font-weight: 300;
+}
+
+.navigation > li {
+  font-size: 0.9rem;
+  line-height: 1rem;
+  padding: 0rem 0rem 1.8rem 0rem;
+  font-weight: 300;
+  list-style-type: none;
+}
+
+.css-m3-link:hover {
+  color: black;
+}
+
+.css-m3-link {
+  color: grey;
+  text-decoration: none;
+  margin: 1rem 0rem;
+}
+
+.right {
+  width: 75%;
+  padding: 2rem;
+}
+
+.buttons-section {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+}
+
+.buttons-section > div {
+  padding-bottom: 1rem;
+}
+
+.buttons-section > div > button {
+  margin-right: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cards-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.cards-section > .full-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.cards-section > .full-cards > div {
+  margin: 1rem;
+}
+
+.cards-section > .small-cards {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.cards-section > .small-cards > div {
+  margin: 1rem;
+}
+
+.forms-section {
+  display: flex;
+  flex-direction: column;
+}
+
+.forms-section > .m3-container {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.nav-section > div {
+  margin-bottom: 1rem;
+}
+
+.nav-section > .horizontal-section > div > p {
+  font-weight: 500;
+}
+
+.nav-section > .vertical-section > div > p {
+  font-weight: 500;
+}
+
+.typography-section > div {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid grey;
+  /* box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.2), 0 2px 4px 0 rgba(0, 0, 0, 0.19); */
+}
+
+.typography-section > div > h6 {
+  font-weight: 300;
+}

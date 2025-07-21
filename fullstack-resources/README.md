@@ -12,6 +12,7 @@
 
 - [JS Challenges](https://www.jschallenger.com/)
 - [advent JS](https://adventjs.dev/)
+- [JavaScript info](https://javascript.info/)
 
 ### Machine Coding
 

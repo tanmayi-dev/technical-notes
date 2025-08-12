@@ -40,9 +40,14 @@
 
 ### Module 1 : Introducing Generative AI
 
+**Terms and Definitions**
+
 - Artificial intelligence (AI) refers to machines capable of performing tasks that typically require human intelligence.
 - Machine learning (ML) is a subset of AI in which systems learn from structured data and improve performance of a specific task over time without being explicitly programmed to do so. It takes a set of inputs and predicts an output based on an algorithm trained with labelled data.
 - Deep learning (DL) is a subset of machine learning that uses artificial neural networks to learn from unstructured data in a way that is inspired by the human brain. DL is capable of taking in very large amounts of unlabeled data, but its goal is still to make a specific prediction.
 - Generative AI is a sub-field of AI. It’s a type of AI that can create new content and ideas, including conversations, stories, images, videos, and music
 
 <img width="1534" height="390" alt="image" src="https://github.com/user-attachments/assets/43c8b8fc-4bd4-4ece-ad46-a9ffdf29ba1a" />
+
+**Foundation Models**
+

@@ -676,6 +676,10 @@ gcloud compute firewall-rules create http2 --network default --allow=tcp:80 \
 ```bash
 
 # Set zone variable
+# ZONE=$(gcloud compute project-info describe \
+  --format="value(commonInstanceMetadata.items[google-compute-default-zone])")
+# REGION=$(gcloud compute project-info describe \
+  --format="value(commonInstanceMetadata.items[google-compute-default-region])")
 ZONE=zone
 REGION=region
 PROJECT_ID=$(gcloud config get-value project)
@@ -731,7 +735,7 @@ curl http://[IP_ADDRESS]
 
 ```
 
-### Task 2 : Configure the loadn balancing service
+### Task 2 : Configure the load balancing service
 
 ```bash
 # Create a static external IP address for your load balancer:

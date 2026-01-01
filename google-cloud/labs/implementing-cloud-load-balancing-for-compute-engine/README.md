@@ -680,8 +680,8 @@ gcloud compute firewall-rules create http2 --network default --allow=tcp:80 \
   --format="value(commonInstanceMetadata.items[google-compute-default-zone])")
 # REGION=$(gcloud compute project-info describe \
   --format="value(commonInstanceMetadata.items[google-compute-default-region])")
-ZONE=zone
-REGION=region
+ZONE=us-central1-c
+REGION=us-central1
 PROJECT_ID=$(gcloud config get-value project)
 
 # Create web1 VM

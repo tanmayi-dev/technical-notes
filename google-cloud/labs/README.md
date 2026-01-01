@@ -5,7 +5,7 @@
 - [ ] [Google Cloud Fundamentals: Core Infrastructure](https://www.cloudskillsboost.google/course_templates/60)
 
 ### Week 2
-- [ ] [★ Set Up an App Dev Environment on Google Cloud(Required)](https://www.cloudskillsboost.google/course_templates/637)
+- [x] [★ Set Up an App Dev Environment on Google Cloud(Required)](https://www.cloudskillsboost.google/course_templates/637)
 - [ ] [Essential Google Cloud Infrastructure: Foundation](https://www.cloudskillsboost.google/course_templates/50)
 - [ ] [Logging, Monitoring and Observability in Google Cloud](https://www.cloudskillsboost.google/paths/12/course_templates/99)
 

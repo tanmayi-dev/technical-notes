@@ -419,17 +419,257 @@ Note: To open the Cloud Shell Editor, click Open Editor on the Cloud Shell toolb
 
 ### Task 2 : Create a backend managed instance group
 
+Google cloud can automatically create and maintain identical copies of your service using "Managed instance group"
+
+#### Create the startup script
+
+1. Create your `backend.sh` script in the home directory : 
+
+```
+touch ~/backend.sh
+```
+
+2. Click Open Editor icon in Cloud Shell toolbar. Open in a new window
+
+3. Select the `backend.sh` file in the File Explorer pane
+
+4. Add the following script into the Editor : 
+```
+sudo chmod -R 777 /usr/local/sbin/
+sudo cat << EOF > /usr/local/sbin/serveprimes.py
+import http.server
+
+def is_prime(a): return a!=1 and all(a % i for i in range(2,int(a**0.5)+1))
+
+class myHandler(http.server.BaseHTTPRequestHandler):
+  def do_GET(s):
+    s.send_response(200)
+    s.send_header("Content-type", "text/plain")
+    s.end_headers()
+    s.wfile.write(bytes(str(is_prime(int(s.path[1:]))).encode('utf-8')))
+
+http.server.HTTPServer(("",80),myHandler).serve_forever()
+EOF
+nohup python3 /usr/local/sbin/serveprimes.py >/dev/null 2>&1 &
+```
+
+5. Click File > Save but do not close the File
+
+6. Click the Gemini Code Assist: Smart Actions icon and select Explain this
+
+7. Replace the prefilled prompt with the following and click Send : 
+```
+As an Application Developer at Cymbal AI, explain the backend.sh startup script to a new team member. This script is used to run a small Python web server written in a Python file serveprimes.py. Provide a detailed breakdown of the script's key components and explain the function of each command.
+
+For the suggested improvements, don't make any changes to the file's content.
+```
+
+#### Create the instance template
+
+8. Create the instance template `primecalc`:
+```
+gcloud compute instance-templates create primecalc \
+--metadata-from-file startup-script=backend.sh \
+--no-address --tags backend --machine-type=e2-medium
+```
+- `--no-address`, meaning these backend VMs won't have public internet access for security reasons.
+
+#### Open the firewall
+
+9. Open the firewall to port `80` : 
+```
+gcloud compute firewall-rules create http --network default --allow=tcp:80 \
+--source-ranges IP --target-tags backend
+```
+
+#### Create the instance group
+
+10. Create the managed instance group named `backend`. Start off with 3 instances : 
+```
+gcloud compute instance-groups managed create backend \
+--size 3 \
+--template primecalc \
+--zone ZONE
+```
+
+11. Navigate to Compute Engine > VM instances. The backends are now ready to serve traffic.
+
 ### Task 3 : Set up the internal load balancer
+
+An Internal Load Balancer consists of 3 main parts : 
+- Forwarding Rule : This is the actual private IP address that other internal services send requests to. It "forwards" traffic to your backend service.
+- Backend Service : This defines how the load balancer distributes traffic to your VM instances. It also includes the health check.
+- Health Check : This is a continuous check that monitors the "health" of your backend VMs. The load balancer only sends traffic to machines that are passing their health checks, ensuring your service is always available.
+
+<img width="650" height="422" alt="Screenshot 2026-01-01 at 2 06 14 PM" src="https://github.com/user-attachments/assets/95ba2ff2-4ee7-4c47-848e-eb8c64cf17b0" />
+
+#### Create a health check 
+
+1. A health check is needed to make sure the load balancer only sends traffic to healthy instances. Your backend service is an HTTP server, so run the following command to check if it responds with a "200 OK" on a specific URL path (in this case, /2 to check if 2 is prime):
+```
+gcloud compute health-checks create http ilb-health --request-path /2
+```
+
+#### Create a backend service
+
+2. Create the backend service named `prime-service`:
+```
+gcloud compute backend-services create prime-service \
+--load-balancing-scheme internal --region=REGION \
+--protocol tcp --health-checks ilb-health
+```
+This service ties the health check to the instance group.
+
+#### Add the instance group to the backend service
+
+3. Run the following command to connect your backend instance group to the prime-service backend service. This tells the load balancer which machines it should manage:
+```
+gcloud compute backend-services add-backend prime-service \
+--instance-group backend --instance-group-zone=ZONE \
+--region=REGION
+```
+
+#### Create the forwarding rule
+
+4. Finally, run the following command to create a forwarding rule named `prime-lb with` a static IP of IP:
+```
+gcloud compute forwarding-rules create prime-lb \
+--load-balancing-scheme internal \
+--ports 80 --network default \
+--region=REGION --address IP \
+--backend-service prime-service
+```
+
+Your internal "prime number calculation" service is now fully set up and ready to be queried via its internal IP address.
 
 ### Task 4 : Test the load balancer
 
+To test the load balancer, you need to create a new VM instance in the same network as your internal Application Load Balancer. It's only accessible from within your private cloud network, not directly from Cloud Shell (which lives outside this specific network).
+
+1. Create a simple test instance:
+```
+gcloud compute instances create testinstance \
+--machine-type=e2-standard-2 --zone ZONE
+```
+
+2. Run the following command to SSH into it
+```
+gcloud compute ssh testinstance --zone ZONE
+```
+If prompted, type Y and press Enter twice to proceed.
+
+#### Query the load balancer
+
+3. From inside the test instance, run the following curl commands to ask your internal Application Load Balancer's IP address if a few numbers are prime:
+```
+curl IP/2
+curl IP/4
+curl IP/5
+```
+The output shows True or False right next to your command line.
+
+4. Run the following command to leave the test instance
+```
+exit
+```
+
+5. Run the following command to delete it because it's not needed any more
+```
+gcloud compute instances delete testinstance --zone=ZONE
+```
+
+6. Type in Y to confirm the deletion.
+
+
 ### Task 5 : Create a public-facing web server
+
+Create a public-facing web server that users the internal "prime number calculator" service (via the internal Application Load Balancer) to display a matrix of prime numbers.
+
+1. Run the following command to create startup script for this public-facing "frontend" in the home directory : 
+```
+touch ~/frontend.sh
+```
+
+2. Launch the Code Editor by selecting it in the shell
+
+3. Select the `frontend.sh` file in the file Explorer pane
+
+4. Now add the following script into the Editor :
+```
+sudo chmod -R 777 /usr/local/sbin/
+sudo cat << EOF > /usr/local/sbin/getprimes.py
+import urllib.request
+from multiprocessing.dummy import Pool as ThreadPool
+import http.server
+PREFIX="http://IP/" #HTTP Load Balancer
+def get_url(number):
+    return urllib.request.urlopen(PREFIX+str(number)).read().decode('utf-8')
+class myHandler(http.server.BaseHTTPRequestHandler):
+  def do_GET(s):
+    s.send_response(200)
+    s.send_header("Content-type", "text/html")
+    s.end_headers()
+    i = int(s.path[1:]) if (len(s.path)>1) else 1
+    s.wfile.write("<html><body><table>".encode('utf-8'))
+    pool = ThreadPool(10)
+    results = pool.map(get_url,range(i,i+100))
+    for x in range(0,100):
+      if not (x % 10): s.wfile.write("<tr>".encode('utf-8'))
+      if results[x]=="True":
+        s.wfile.write("<td bgcolor='#00ff00'>".encode('utf-8'))
+      else:
+        s.wfile.write("<td bgcolor='#ff0000'>".encode('utf-8'))
+      s.wfile.write(str(x+i).encode('utf-8')+"</td> ".encode('utf-8'))
+      if not ((x+1) % 10): s.wfile.write("</tr>".encode('utf-8'))
+    s.wfile.write("</table></body></html>".encode('utf-8'))
+http.server.HTTPServer(("",80),myHandler).serve_forever()
+EOF
+nohup python3 /usr/local/sbin/getprimes.py >/dev/null 2>&1 &
+```
+
+5. Click File > Save. Do not close the file
+
+6. Click the Gemini Code Assist: Smart Actions icon and select Explain this
+
+7. Replace the prefilled prompt with the following and click Send : 
+```
+You are an Application Developer at Cymbal AI. A new team member needs help understanding this startup script, which is used to run a public-facing web server written in the Python file getprimes.py. Explain the frontend.sh script in detail. Break down its key components, the commands used, and their function within the script.
+
+For suggested improvements, do not make any changes to the file's content.
+```
+
+#### Create the frontend instance
+
+8. Run the following code to create an instance named frontend that runs this web server
+```
+gcloud compute instances create frontend --zone=ZONE \
+--metadata-from-file startup-script=frontend.sh \
+--tags frontend --machine-type=e2-standard-2
+```
+
+#### Open the firewall for the frontend
+
+9. This is a public-facing server, so you need to run the following command to open its firewall to allow traffic from anywhere on the internet (0.0.0.0/0) on port 80:
+```
+gcloud compute firewall-rules create http2 --network default --allow=tcp:80 \
+--source-ranges 0.0.0.0/0 --target-tags frontend
+```
+
+10. In Navigation menu, click Compute Engine > VM instances. Refresh your browser if you dont see the `frontend` instance
+
+11. Open the External IP for the frontend in your browser :
+<img width="645" height="203" alt="Screenshot 2026-01-01 at 2 45 20 PM" src="https://github.com/user-attachments/assets/e96c6b6f-f639-429f-9665-abbfce5e747e" />
+
+12. You should see a matrix like this, showing all prime numbers up to 100 in green
+<img width="236" height="289" alt="Screenshot 2026-01-01 at 2 45 59 PM" src="https://github.com/user-attachments/assets/d430bc58-68ae-43b1-ad58-1b89583acde1" />
+
+13. Try adding a number to the path, like `http://your-ip/10000`, to see all prime numbers starting from that number.
+<img width="464" height="287" alt="Screenshot 2026-01-01 at 2 46 52 PM" src="https://github.com/user-attachments/assets/c8d5eedc-5728-4da9-8119-aedd1c49a898" />
 
 
 ----
 
 ## Implement Load Balancing on Compute Enginer: Challenge Lab <a id="4"></a>
-
 
 ### Task 1 - Create multiple web server instances
 

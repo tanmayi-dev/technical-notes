@@ -1,0 +1,463 @@
+# Cloud Architecture : Design, Implment and Manage
+
+- [Deploy a Compute Instance with Remote Startup Script: Challenge Lab](#1)
+- [Configure Secure RDP using a Windows Bastion Host: Challenge Lab](#2)
+- [Build and Deploy a Docker Image to Kubernetes Cluster: Challenge Lab](#3)
+- [Scale Out and Update a Containerized Application on a Kubernetes Cluster: Challenge Lab](#4)
+- [Migrate a MySQL Database to Google Cloud SQL: Challenge Lab](#5)
+- [Deploy and Troubleshoot a Website: Challenge Lab](#6)
+
+## Deploy a Compute Instance with Remote Startup Script: Challenge Lab <a id="1"></a>
+
+
+### Task 1. Create a Storage Bucket
+First, initialize your environment variables and create the bucket to hold the startup script. Replace [PROJECT_ID] with your actual Google Cloud Project ID.
+
+```bash
+
+# Set variables
+export PROJECT_ID=$(gcloud config get-value project)
+export BUCKET_NAME=$PROJECT_ID-bucket
+export ZONE=us-east4-a
+
+# Create the bucket
+gsutil mb gs://$BUCKET_NAME
+
+# Copy the startup script from the public source to your bucket
+gsutil cp gs://spls/gsp301/install-web.sh gs://$BUCKET_NAME/install-web.sh
+
+```
+
+### Task 2. Create a VM Instance with a Remote Startup Script
+When creating the VM, you must use the startup-script-url metadata key. Crucially, you must grant the VM Read Only storage scopes so it can access the script in the bucket.
+
+```bash
+
+gcloud compute instances create instance-1 \
+    --zone=$ZONE \
+    --machine-type=e2-medium \
+    --network-interface=network-tier=PREMIUM,subnet=default \
+    --metadata=startup-script-url=gs://$BUCKET_NAME/install-web.sh \
+    --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
+    --tags=http-server
+```
+
+### Task 3. Create a Firewall Rule
+The VM is tagged with http-server, so we need a firewall rule that allows traffic on port 80 for that specific tag.
+
+```bash
+
+gcloud compute firewall-rules create allow-http \
+    --direction=INGRESS \
+    --priority=1000 \
+    --network=default \
+    --action=ALLOW \
+    --rules=tcp:80 \
+    --source-ranges=0.0.0.0/0 \
+    --target-tags=http-server
+
+```
+
+### Task 4. Test the VM
+Wait about 60–90 seconds after the VM is created for the script to finish installing Apache. Then, run this command to get your IP and test the connection.
+
+```bash
+
+# Get the external IP address
+EXTERNAL_IP=$(gcloud compute instances describe instance-1 --zone=$ZONE --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+
+# Print the URL to click
+echo "http://$EXTERNAL_IP"
+
+# Test via command line
+curl http://$EXTERNAL_IP
+```
+
+----
+
+## Configure Secure RDP using a Windows Bastion Host: Challenge Lab <a id="2"></a>
+
+### Task 1. Create the VPC Network
+This established the isolated environment and the firewall for external access.
+
+```bash
+
+# 1. Create the VPC network
+gcloud compute networks create securenetwork --subnet-mode=custom
+
+# 2. Create the subnet in us-west1
+gcloud compute networks subnets create secure-subnet \
+    --network=securenetwork \
+    --region=us-west1 \
+    --range=10.0.0.0/24
+
+# 3. Create the firewall rule to allow RDP to the Bastion
+gcloud compute firewall-rules create allow-rdp-securenetwork \
+    --network=securenetwork \
+    --allow=tcp:3389 \
+    --source-ranges=0.0.0.0/0 \
+    --target-tags=rdp-bastion
+```
+
+### Task 2. Deploy the Windows Instances
+Both VMs were created with two network interfaces to satisfy the lab requirements.
+
+```bash
+
+# 1. Create the Secure Host (No External IP)
+gcloud compute instances create vm-securehost \
+    --zone=us-west1-a \
+    --machine-type=e2-medium \
+    --image-family=windows-2016 \
+    --image-project=windows-cloud \
+    --network-interface=subnet=secure-subnet,no-address \
+    --network-interface=network=default,no-address
+
+# 2. Create the Bastion Host (With External IP)
+gcloud compute instances create vm-bastionhost \
+    --zone=us-west1-a \
+    --machine-type=e2-medium \
+    --image-family=windows-2016 \
+    --image-project=windows-cloud \
+    --network-interface=subnet=secure-subnet \
+    --network-interface=network=default,no-address \
+    --tags=rdp-bastion
+```
+
+### Task 3. Configure the Passwords and IPs
+You used these commands to get your access credentials and identify the internal/external addresses.
+
+```bash
+
+# Generate passwords (needed if using GUI)
+gcloud compute reset-windows-password vm-bastionhost --user app_admin --zone=us-west1-a
+gcloud compute reset-windows-password vm-securehost --user app_admin --zone=us-west1-a
+
+# List IPs to find the Internal IP (10.0.0.2) of the secure host
+gcloud compute instances list --filter="name=(vm-bastionhost OR vm-securehost)" \
+--format="table(name, networkInterfaces[0].accessConfigs[0].natIP:label=EXTERNAL_IP, networkInterfaces[0].networkIP:label=INTERNAL_IP)"
+```
+
+### Task 4. Install IIS (Remote Bypass Method)
+Since you could not RDP from your office laptop, we used metadata to automate the IIS installation.
+
+```bash
+
+# 1. Add the PowerShell installation script to the VM metadata
+gcloud compute instances add-metadata vm-securehost \
+    --metadata=windows-startup-script-ps1="Install-WindowsFeature -name Web-Server -IncludeManagementTools" \
+    --zone=us-west1-a
+
+# 2. Reset the VM to force the startup script to run
+gcloud compute instances reset vm-securehost --zone=us-west1-a
+
+# 3. Monitor the serial logs for the "Success" and "Exit status 0" messages
+gcloud compute instances get-serial-port-output vm-securehost --zone=us-west1-a
+```
+
+
+----
+
+## Build and Deploy a Docker Image to Kubernetes Cluster: Challenge Lab <a id="3"></a>
+
+```
+
+Phase 1: Setup and Initialization
+Open the Cloud Shell and set your environment variables to ensure the commands run in the correct project and zone.
+
+Set the Project ID:
+
+Bash
+
+export PROJECT_ID=$(gcloud config get-value project)
+Set the Zone:
+
+Bash
+
+gcloud config set compute/zone us-east1-d
+Task 1: Create a Kubernetes Cluster
+You need to create a cluster named echo-cluster with specific resource limits (2 nodes of e2-standard-2).
+
+Bash
+
+gcloud container clusters create echo-cluster \
+    --num-nodes=2 \
+    --machine-type=e2-standard-2 \
+    --zone=us-east1-d
+Note: This process usually takes about 3 to 5 minutes.
+
+Task 2 & 3: Build and Push the Docker Image
+You must retrieve the source code from Cloud Storage, build it using Docker, and push it to the Google Container Registry (gcr.io).
+
+Download the source code:
+
+Bash
+
+gsutil cp gs://$PROJECT_ID/echo-web.tar.gz .
+tar -xvzf echo-web.tar.gz
+Build the image with the v1 tag: Ensure you are in the directory where the Dockerfile is located.
+
+Bash
+
+docker build -t gcr.io/$PROJECT_ID/echo-app:v1 .
+Push to Container Registry: Configure Docker authentication for Google Cloud and upload the image.
+
+Bash
+
+gcloud auth configure-docker
+docker push gcr.io/$PROJECT_ID/echo-app:v1
+Task 4: Deploy the Application
+Now, deploy the image to your cluster and expose it to external traffic.
+
+Create the Deployment: Use the required name echo-web and point to the image you just pushed.
+
+Bash
+
+kubectl create deployment echo-web --image=gcr.io/$PROJECT_ID/echo-app:v1
+Expose the Deployment: The application listens on port 8000 inside the container, but you must expose it on port 80 for the web.
+
+Bash
+
+kubectl expose deployment echo-web \
+    --type=LoadBalancer \
+    --port=80 \
+    --target-port=8000
+Verification Checklist
+Before clicking the Check my progress buttons, verify your work:
+
+Cluster Check: Run gcloud container clusters list to ensure echo-cluster is running in us-east1-d.
+
+Image Check: Go to Container Registry in the console to see if echo-app:v1 exists.
+
+Service Check: Run kubectl get service. Wait until the EXTERNAL-IP changes from <pending> to an actual IP address.
+
+Connectivity Check: Once the IP is available, run:
+
+Bash
+
+curl http://[YOUR_EXTERNAL_IP]
+```
+
+
+----
+
+## Scale Out and Update a Containerized Application on a Kubernetes Cluster: Challenge Lab <a id="4"></a>
+
+```
+1. Initialize the Environment
+Open Cloud Shell and set your variables. Replace [PROJECT_ID] with your specific project ID (e.g., qwiklabs-gcp-02-02396689d3f8).
+
+Bash
+
+# Set your Project ID variable
+export PROJECT_ID=$(gcloud config get-value project)
+
+# Set the Zone
+gcloud config set compute/zone us-central1-c
+
+# Get credentials for the existing cluster
+gcloud container clusters get-credentials echo-cluster --zone us-central1-c
+2. Build and Tag the v2 Image (Tasks 1 & 2)
+You need to download the updated source code, build the container, and push it to the registry.
+
+Bash
+
+# Download the v2 source code
+gsutil cp gs://$PROJECT_ID/echo-web-v2.tar.gz .
+
+# Extract the files
+tar -xvzf echo-web-v2.tar.gz
+
+# Build the Docker image with the v2 tag
+docker build -t gcr.io/$PROJECT_ID/echo-app:v2 .
+
+# Authenticate and push the image to GCR
+gcloud auth configure-docker --quiet
+docker push gcr.io/$PROJECT_ID/echo-app:v2
+3. Deploy and Expose the Application (Task 3)
+Since the deployment wasn't found earlier, we will create it fresh using the v2 image and expose it via a LoadBalancer.
+
+Bash
+
+# Create the deployment named echo-web using the v2 image
+kubectl create deployment echo-web --image=gcr.io/$PROJECT_ID/echo-app:v2
+
+# Expose the deployment on Port 80 (mapping to container port 8000)
+kubectl expose deployment echo-web --type=LoadBalancer --port 80 --target-port 8000
+4. Scale Out the Application (Task 4)
+The lab requires the application to run on 2 instances (replicas).
+
+Bash
+
+# Scale the deployment to 2 replicas
+kubectl scale deployment echo-web --replicas=2
+5. Final Confirmation (Task 5)
+Verify that everything is running and responding correctly.
+
+Bash
+
+# Check if pods are running
+kubectl get pods
+
+# Get the External IP address
+kubectl get service echo-web
+Once the External IP appears (it may take a minute), copy it and run:
+
+Bash
+
+curl http://[YOUR_EXTERNAL_IP]
+Note: The output should show that version v2 is running.
+
+```
+
+
+----
+## Migrate a MySQL Database to Google Cloud SQL: Challenge Lab <a id="5"></a>
+
+```
+Phase 1: Infrastructure Setup (Cloud Shell)First, you prepared the managed environment in Google Cloud SQL.1. Set the DefaultsTo ensure resources were created in the correct location:Bashgcloud config set compute/region [REGION]
+gcloud config set compute/zone [ZONE]
+2. Create the Cloud SQL InstanceYou created a MySQL 5.7 instance with specific hardware and a root password:Bashgcloud sql instances create wordpress-db \
+--database-version=MYSQL_5_7 \
+--tier=db-n1-standard-1 \
+--root-password=Password1*
+3. Configure the Database and UserYou created the specific database and the user WordPress requires to connect:Bash# Create the database
+gcloud sql databases create wordpress --instance=wordpress-db
+
+# Create the user
+gcloud sql users create blogadmin \
+--host=% \
+--instance=wordpress-db \
+--password=Password1*
+
+Phase 2: Data Migration (Blog VM SSH)
+In this phase, you moved the actual data from the source to the destination.
+
+4. Export (Dump) the Local Data
+Inside the blog VM, you exported the existing data to a .sql file:
+
+Bash
+
+mysqldump -u blogadmin -p wordpress > wordpress.sql
+# Password: Password1*
+5. Authorize the VM (Crucial Step)
+Back in Cloud Shell, you whitelisted the VM's external IP so it could talk to the SQL instance.
+
+Note: The /32 is required by the lab's scoring bot and indicates a single host.
+
+Bash
+
+gcloud sql instances patch wordpress-db --authorized-networks=[VM_EXTERNAL_IP]/32
+6. Import Data to Cloud SQL
+In the VM SSH window, you sent the data to the new Cloud SQL Public IP:
+
+Bash
+
+mysql -h [CLOUD_SQL_IP] -u blogadmin -p wordpress < wordpress.sql
+Phase 3: Application Reconfiguration (Blog VM SSH)
+Finally, you pointed the WordPress application to the new "brain" (the Cloud SQL instance).
+
+7. Update wp-config.php
+You updated the database host from localhost to the new Cloud SQL Public IP:
+
+Bash
+
+sudo sed -i 's/localhost/[CLOUD_SQL_IP]/g' /var/www/html/wordpress/wp-config.php
+8. Restart and Verify
+You restarted the web server to apply the changes:
+
+Bash
+
+sudo systemctl restart apache2
+
+
+#### Troubleshooting Summary 
+
+| Issue | Solution |
+| ---- | --- |
+| "System has not been booted with systemd" | You were in Cloud Shell. you needed to be inside the VM SSH. |
+| mysqldump stuck/refused  |    Ensure the local MySQL service is running or use -h 127.0.0.1. |
+| Import Command "Stuck"  |  Firewall/Authorized Networks issue. The VM IP wasn't whitelisted yet. |
+| Task 3  Failing Score   |  Required the /32 CIDR notation in the authorized network list. |
+
+````
+
+----
+## Deploy and Troubleshoot a Website: Challenge Lab <a id="6"></a>
+
+```
+Task 1: Create the Linux VM Instance
+This command creates the virtual machine in the specific zone required by the lab.
+
+Bash
+
+gcloud compute instances create dev-pln-xw7 \
+    --project=$DEVSHELL_PROJECT_ID \
+    --zone=europe-west4-b \
+    --machine-type=e2-medium \
+    --image-family=debian-11 \
+    --image-project=debian-cloud \
+    --boot-disk-size=10GB
+Task 2: Enable Public Access (Firewall)
+To allow web traffic, you must create a firewall rule for Port 80 and then "tag" the VM so the rule applies to it.
+
+Create the firewall rule:
+
+Bash
+
+gcloud compute firewall-rules create allow-http-traffic \
+    --direction=INGRESS \
+    --priority=1000 \
+    --network=default \
+    --action=ALLOW \
+    --rules=tcp:80 \
+    --source-ranges=0.0.0.0/0 \
+    --target-tags=http-server
+Apply the tag to your VM:
+
+Bash
+
+gcloud compute instances add-tags dev-pln-xw7 \
+    --tags=http-server \
+    --zone=europe-west4-b
+Task 3: Install & Configure Apache
+Connect to your VM via SSH and set up the web server.
+
+SSH into the VM:
+
+Bash
+
+gcloud compute ssh dev-pln-xw7 --zone=europe-west4-b
+Run these commands inside the VM terminal:
+
+Bash
+
+# Update packages and install Apache
+sudo apt-get update
+sudo apt-get install apache2 -y
+
+# Create the "Hello World" placeholder page
+echo '<!doctype html><html><body><h1>Hello World!</h1></body></html>' | sudo tee /var/www/html/index.html
+
+# Exit the VM to return to Cloud Shell
+exit
+Task 4: Test the Server
+Verify the site is live using the VM's External IP.
+
+Retrieve the External IP:
+
+Bash
+
+EXTERNAL_IP=$(gcloud compute instances describe dev-pln-xw7 \
+    --zone=europe-west4-b \
+    --format='get(networkInterfaces[0].accessConfigs[0].natIP)')
+
+echo $EXTERNAL_IP
+Test via Curl:
+
+Bash
+
+curl http://$EXTERNAL_IP
+```
+
+---

@@ -219,23 +219,494 @@ Below are the three deliverables you asked for (services table, tradeoffs table,
 |--------------|---------------|----------------------------------|
 | Business: optimize storage cost w/ high availability; natural language interaction + 24/7 support; summarization; metadata extraction; detect inappropriate content; better ops reliability. | GKE for content mgmt/delivery; Cloud Storage for media; BigQuery as warehouse; Cloud Run for event-driven tasks (transcoding/metadata/recommendations); some on‑prem ingestion/archival; Monitoring + Prometheus/email alerts. | Keep GKE + Cloud Run; add centralized management for hybrid (Istio/Anthos/Service Mesh/Fleets); Cloud Storage lifecycle + Storage Transfer; Pub/Sub + Dataflow → BigQuery; Vertex AI + prebuilt APIs for enrichment; improve alerting/ops. |
 
+**Key Exam Questions & Patterns:**
+
+**Video Transcoding & Processing:**
+- **Requirement**: Modernize video transcoding from expensive on-premises hardware
+- **Solution**: Cloud Run jobs with GPU acceleration, triggered by Pub/Sub
+- **Why**: Serverless (scale to zero), handles millions of independent jobs, supports GPU, minimal ops overhead
+- **Wrong choices**: GKE Standard (too much ops), Cloud Functions (not for long-running/GPU tasks), Dataflow (overkill for file processing)
+
+**Global Content Delivery:**
+- **Requirement**: Low latency for petabyte-scale video library in emerging markets with high availability
+- **Solution**: Multi-Regional Cloud Storage + Cloud CDN
+- **Why**: Multi-regional provides geo-redundancy and DR; CDN caches at edge for low latency
+- **Wrong choices**: Single-region bucket (no DR), Cloud SQL (not for object storage), Custom VMs (high ops overhead)
+
+**Hybrid Cloud Management:**
+- **Requirement**: Manage containerized apps across GKE and AWS EKS with unified policies
+- **Solution**: Anthos for multi-cloud Kubernetes management
+- **Why**: Single pane of glass, consistent security policies, works across GCP/on-prem/AWS
+- **Wrong choices**: VPC Peering (only network connectivity), Terraform (no centralized management), Cloud Run (cloud-only)
+
+**AI/ML Model Performance:**
+- **Issue**: Recommendation engine accuracy dropped despite no code changes
+- **Root cause**: Data drift (user behavior changed over time)
+- **Solution**: Vertex AI Model Monitoring to detect drift and trigger retraining
+- **Related concepts**: Training-serving skew (difference between training/production data)
+- **Wrong choices**: Bigtable hot-spotting (performance issue, not accuracy), Model Garden version (not the cause)
+
+**GenAI Capabilities:**
+- **Requirement**: Centralized discovery and deployment of foundation models (Gemini) and open-source models
+- **Solution**: Vertex AI Model Garden
+- **Why**: Central repository for pre-trained models, no infrastructure management
+- **Wrong choices**: AutoML Tables (for structured data only), Bigtable (database, not AI platform), Vertex AI Pipelines (for orchestration, not discovery)
+
 ### Cymbal Retail
 
 | Requirements | Current infra | "Slide" proposed solution anchors |
 |--------------|---------------|----------------------------------|
-| Business: automate catalog enrichment; improve discoveerce; reduce call center + hosting costs. Tech: attribute + image generation; natural-language product discovery; scalability; HITL review UI; security/compliance. | Mix of on‑prem + cloud; DBs: MySQL, SQL Server, Redis, MongoDB; Kubernetes clusters; SFTP/ETL batch integrations; custom web app queries relational DB for browsing; IVR + manual agent ordering; OSS monitoring (Grafana/Nagios/Elastic). | Vertex AI (Gemini) for attributes/descriptions; Imagen for image creation; Vertex AI Search for Commerce; Dialogflow CX / conversational commerce; migrate K8s → GKE Autopilot or Cloud Run; migrate MySQL/SQL Server → Cloud SQL; use BigQuery to break silos; Composer/Data Fusion for orchestration; Apigee for integrations; upgrade monitoring/security (Logging/Monitoring, KMS, VPC‑SC). |
+| Business: automate catalog enrichment; improve discoverability; reduce call center + hosting costs. Tech: attribute + image generation; natural-language product discovery; scalability; HITL review UI; security/compliance. | Mix of on‑prem + cloud; DBs: MySQL, SQL Server, Redis, MongoDB; Kubernetes clusters; SFTP/ETL batch integrations; custom web app queries relational DB for browsing; IVR + manual agent ordering; OSS monitoring (Grafana/Nagios/Elastic). | Vertex AI (Gemini) for attributes/descriptions; Imagen for image creation; Vertex AI Search for Commerce; Dialogflow CX / conversational commerce; migrate K8s → GKE Autopilot or Cloud Run; migrate MySQL/SQL Server → Cloud SQL; use BigQuery to break silos; Composer/Data Fusion for orchestration; Apigee for integrations; upgrade monitoring/security (Logging/Monitoring, KMS, VPC‑SC). |
+
+**Key Exam Questions & Patterns:**
+
+**Drone Delivery Telemetry Pipeline:**
+- **Requirement**: Handle millions of continuous messages, serverless stream processing, petabyte-scale SQL analytics
+- **Solution**: Pub/Sub (ingestion) → Dataflow (processing) → BigQuery (analytics)
+- **Why**: Pub/Sub buffers high-throughput streams; Dataflow is serverless for transformations; BigQuery for SQL analytics
+- **Wrong choices**: Cloud Functions (not for continuous streams), Bigtable (not for ad-hoc SQL), Compute Engine VMs (not serverless)
+
+**Application Modernization (Hybrid Cloud):**
+- **Requirement**: Unified platform for microservices on GCP and on-premises with consistent deployment
+- **Solution**: Anthos for hybrid container management
+- **Why**: Provides single control plane across GCP, on-prem, and other clouds
+- **Wrong choices**: Cloud Deploy (CD tool, not platform), GKE Autopilot (GCP-only), Cloud Run (primarily cloud-only)
+
+**Multi-Cloud Kubernetes Management:**
+- **Requirement**: Manage GKE, on-premises, and EKS clusters with consistent policies
+- **Solution**: Anthos
+- **Why**: Manages Kubernetes across GCP, on-prem, AWS with unified security/policies
+- **Wrong choices**: Migrate all to GKE (not hybrid), Model Garden (for AI models), Bigtable replication (database, not cluster management)
+
+**ML Model Performance Degradation:**
+- **Issue**: Churn prediction model accuracy dropped after a month in production
+- **Root causes to investigate**: Training-serving skew + Data drift
+- **Training-serving skew**: Difference between training and production data handling
+- **Data drift**: Customer behavior changed over time (new competitor, seasonal changes)
+- **Wrong choices**: Model Garden version mismatch (not a drift issue), Bigtable hot-spotting (performance, not accuracy)
+
+**Monolith to Microservices Integration:**
+- **Requirement**: Integrate legacy monolith with new serverless microservices, consistent interface
+- **Solutions**: 
+  1. HTTP(S) Load Balancer + Serverless NEGs (Network Endpoint Groups)
+  2. Cloud Endpoints/Apigee for API management
+- **Why**: NEGs allow seamless integration via URL maps; API management creates unified facade
+- **Wrong choices**: Develop proxy inside monolith (service interruptions, technical debt), App Engine Flexible (can't integrate monolith)
+
+----
 
 ### EHR Healthcare
 
 | Requirements | Current infra | "Slide" proposed solution anchors |
 |--------------|---------------|----------------------------------|
-| Business: scale fast; 99.9% availability; centralized visibility; reduce latency; regulatory compliance; lower admin cost; insights + predictions. Tech: keep legacy insurer interfaces; consistent container mgmt; secure high-performance on‑prem ↔ GCP connectivity; consistent logging/retention/monitoring/alerting; ingest new provider data. | Hosted in multiple colocation DCs; apps web-based, many containerized across Kubernetes clusters; DBs: MySQL, SQL Server, Redis, MongoDB; legacy file/API integrations remain on‑prem for years; Microsoft AD; OSS monitoring; email alerts ignored. | Emphasize HIPAA + data protection (DLP/SDP, KMS/CMEK, org policy, audit); GKE (+ Anthos/Service Mesh) for multi-env mgmt; migrate MySQL/SQL Server → Cloud SQL; Redis → Memorystore; MongoDB → Firestore (or MongoDB on GKE interim); Apigee for integration; improve logging/monitoring + post-mortems. |
+| Business: scale fast; | Hosted in multiple colocation DCs; | Emphasize HIPAA + data protection (DLP/SDP, KMS/CMEK, org policy, audit); | 
+99.9% availability; |apps web-based, many containerized across Kubernetes clusters; | GKE (+ Anthos/Service Mesh) for multi-env mgmt; |
+centralized visibility; | DBs: MySQL, SQL Server, Redis, MongoDB;  | migrate MySQL/SQL Server → Cloud SQL; |
+reduce latency;  | legacy file/API integrations remain on‑prem for years; |  Redis → Memorystore; |
+regulatory compliance; | Microsoft AD; OSS monitoring; email alerts ignored. | MongoDB → Firestore (or MongoDB on GKE interim); | 
+lower admin cost; | | Apigee for integration; |
+insights + predictions.  | | improve logging/monitoring + post-mortems. |
+Tech: keep legacy insurer interfaces; | | |
+consistent container mgmt;  | | |
+secure high-performance on‑prem ↔ GCP connectivity; | | |
+consistent logging/retention/monitoring/alerting; | | |
+ingest new provider data. |     |    |
 
+**Key Exam Questions & Patterns:**
+
+**Gated Egress & API Security:**
+- **Requirement**: Expose on-prem legacy APIs to GCP apps privately (not Internet-accessible)
+- **Solution**: Gated Egress topology + VPC Service Controls
+- **Why**: Apps in GCP access on-prem APIs via private IPs; VPC-SC prevents data exfiltration
+- **Gated Egress**: APIs available only to GCP processes, exposed via Application LB with private IPs
+- **VPC Service Controls**: Isolate services, monitor data theft, restrict access
+- **Wrong choices**: Cloud Endpoints (doesn't support on-prem endpoints), Cloud VPN alone (just connectivity), Cloud Composer (workflow service)
+
+**HIPAA Compliance:**
+- **Requirements**: Process Protected Health Information (PHI) in compliance with HIPAA
+- **Critical steps**:
+  1. Execute Business Associate Agreement (BAA) with Google Cloud
+  2. Verify all services used are HIPAA-compliant (Covered Products)
+- **Why BAA**: Required under HIPAA when cloud provider handles PHI
+- **Why Covered Products**: Not all GCP services are HIPAA-compliant; must verify each one
+- **Wrong choices**: Cloud EKM (not a primary compliance requirement), VPC-SC (security tool, not compliance prerequisite), Firebase Auth (case uses Microsoft AD)
+
+**High-Performance Hybrid Connectivity:**
+- **Requirement**: Production-grade connection to on-prem for 99.9% availability
+- **Solution**: 4 Dedicated Interconnect connections (2 in Metro A, 2 in Metro B)
+- **Why**: Google's recommended practice for 99.99% (exceeds 99.9%); prevents single point of failure
+- **Wrong choices**: 
+  - Cloud VPN (limited throughput, not suitable for high-volume medical records)
+  - Single Interconnect (single point of failure)
+  - Apigee over public Internet (not a layer 2/3 connection)
+
+**Predictive Analytics & Model Monitoring:**
+- **Requirement**: Gain healthcare insights and predictions while minimizing model skew/drift
+- **Solution**: Pub/Sub → Dataflow → BigQuery + Vertex AI Model Monitoring
+- **Why**: Standard data pipeline; Model Monitoring tracks performance degradation over time
+- **Skew**: Difference between training and serving data
+- **Drift**: Data distribution changes over time
+- **Wrong choices**: Manual CSV exports (not scalable), Bigtable with static model (drift issues), Cloud SQL with manual queries (not AI-powered)
+
+**Bigtable Schema Design (Time-Series):**
+- **Best practices for patient metrics**:
+  1. Non-sequential prefix (hashed Patient ID) to prevent hotspotting
+  2. Reversed timestamp for most-recent-first ordering
+- **Why**: Sequential prefixes (like timestamps first) cause all writes to hit one node (hotspot)
+- **Row key pattern**: `patient123#9223372036854775807-timestamp` or `hash(patient123)#timestamp`
+- **Wrong choices**: 
+  - Start with timestamp (causes hotspotting)
+  - Many small tables (anti-pattern in Bigtable)
+
+
+----
 ### KnightMotives Automotive
 
 | Requirements | Current infra | "Slide" proposed solution anchors |
 |--------------|---------------|----------------------------------|
 | Business: consistent in‑vehicle experience across BEV/hybrid/ICE; improve unreliable online ordering + dealer tools; monetize data; address security breaches + EU data protection; improve talent/upskilling. Tech: hybrid cloud; vehicle connectivity esp rural; network upgrades plants↔HQ; modernize legacy systems; autonomous dev/testing; robust data platform + AI/ML infra; stronger security/risk mgmt; CRM + dealer tooling. | Mostly on‑prem; outdated mainframe supply chain + outdated ERP; dealers can't buy new equipment; fragmented codebases and tech debt; connectivity challenges for rural connectivity. | Hybrid cloud: GKE + Anthos/Service Mesh; Network Connectivity Center for plants↔HQ; Android Automotive OS for consistent in‑vehicle UX; IoT pipeline Pub/Sub → Dataflow → BigQuery + Vertex AI lifecycle; rebuild ordering + dealer tools on GKE/Cloud Run; Firestore/Cloud SQL backend; Looker dashboards; Apigee for APIs/monetization; SCC/VPC‑SC/SDP for security. |
+
+**Key Exam Questions & Patterns:**
+
+**Hybrid Cloud Container Management:**
+- **Requirement**: Run containerized microservices on GKE and on-premises with consistent policy management
+- **Solution**: Anthos (now Google Cloud Distributed Cloud)
+- **Why**: Single pane of glass for GKE + on-prem clusters; consistent security policies and service mesh
+- **Wrong choices**: 
+  - EKS on Google Cloud (impossible, EKS is AWS)
+  - Bigtable (database, not container orchestration)
+  - Manual VPN tunnels (not scalable, no unified management)
+
+**Connected Vehicle Telemetry (IoT at Scale):**
+- **Requirement**: Millions of events/second, real-time processing, petabyte-scale analytics, multi-region HA
+- **Solution**: Cloud IoT Core → Pub/Sub → Dataflow → Bigtable (real-time) + BigQuery (analytics)
+- **Why**: 
+  - IoT Core: Secure device management at scale
+  - Pub/Sub: Global message bus, decouples ingestion from processing
+  - Dataflow: Serverless stream processing, auto-scaling
+  - Bigtable: Low-latency operational data for dashboards
+  - BigQuery: Cost-effective historical analytics and ML
+- **Wrong choices**: 
+  - Cloud Storage + Cloud Functions (not for continuous streaming)
+  - Cloud SQL (can't handle millions of writes/second)
+  - Custom Compute Engine VMs (high ops overhead, not serverless)
+  - BigQuery streaming only (no real-time operational metrics)
+
+**Dealer Relationship & CRM:**
+- **Issue**: Unreliable build-to-order systems strain dealer relationships
+- **Solution**: Comprehensive CRM system + modernized online build-to-order tool
+- **Why**: Addresses customer-facing data reliability and dealer transparency
+- **Wrong choices**: 
+  - Migrate mainframe (infrastructure, not dealer-facing issue)
+  - Employee upskilling (human capital, not system reliability)
+  - Subsidize dealer equipment (doesn't fix central tools)
+
+**Vehicle Telemetry Storage (Time-Series):**
+- **Requirement**: High-velocity time-series data, low-latency writes, proactive maintenance alerts
+- **Solution**: Pub/Sub → Dataflow → Bigtable with schema: `Vehicle_ID#reversed_timestamp`
+- **Why**: 
+  - Bigtable: High-throughput, low-latency time-series
+  - Vehicle_ID first: Prevents hotspotting, distributes writes
+  - Reversed timestamp: Latest data first for efficient queries
+- **Wrong choices**: 
+  - BigQuery with star schema (not for low-latency point lookups)
+  - Cloud Storage + BigQuery Omni (not real-time)
+  - Timestamp-first row key (causes hotspotting - CRITICAL ERROR)
+
+**Model Performance & Drift:**
+- **Issue**: Visual damage inspection model accuracy drops with new geographic regions/car models
+- **Concept**: Model Skew (training vs production data difference) and Data Drift (data changes over time)
+- **Solution**: Vertex AI Model Monitoring to detect skew and drift, trigger retraining
+- **Why**: Monitors data distributions, alerts when performance degrades
+- **Wrong choices**: 
+  - Re-normalize dataset with Dataflow (doesn't solve fundamental drift)
+  - Switch to different Model Garden model (no model is "immune" to drift)
+  - GKE autoscaling (resource issue, not accuracy issue)
+
+-----
+
+### TerramEarth
+
+**Company Overview:**
+- Manufactures heavy equipment for mining and agricultural industries
+- 500+ dealers and service centers in 100 countries
+- 2 million vehicles in operation, 20% yearly growth
+- Vehicles generate 200-500 MB of data per day
+
+**Existing Technical Environment:**
+- Vehicle data aggregation and analysis in Google Cloud
+- Manufacturing plant sensor data sent to private data centers
+- Legacy inventory and logistics in on-premises data centers
+- Multiple network interconnects to Google Cloud
+- Web frontend for dealers/customers runs in GCP
+
+**Business Requirements:**
+- Predict and detect vehicle malfunction
+- Rapid parts shipping for just-in-time repair
+- Decrease cloud operational costs and adapt to seasonality
+- Increase speed and reliability of development workflow
+- Allow remote developers to be productive without compromising security
+- Create flexible platform for custom API services for dealers/partners
+
+**Technical Requirements:**
+- Abstraction layer for HTTP API access to legacy systems
+- Modernize CI/CD pipelines for container-based workloads
+- Allow developer experiments without compromising security/governance
+- Self-service portal for developers to create projects and request resources
+- Cloud-native solutions for keys/secrets management
+- Identity-based access optimization
+
+**Key Exam Questions & Patterns:**
+
+**Real-Time vs Batch Data Ingestion:**
+- **Scenario**: Critical data in real-time, bulk sensor data uploaded daily
+- **Solution**: 
+  1. Real-time: Pub/Sub → Dataflow → Cloud Storage + BigQuery
+  2. Daily batch: Parallel composite uploads to Cloud Storage → Cloud Storage Trigger → Dataflow → BigQuery
+- **Why**: 
+  - Pub/Sub: Flexible, secure, at-least-once delivery
+  - Dataflow: Unified processing for both real-time and batch
+  - Store in both Cloud Storage (complete data) and BigQuery (aggregated analytics)
+  - Parallel composite uploads: Handle large 200-500 MB daily files efficiently
+- **Wrong choices**: 
+  - Real-time to BigQuery only (doesn't store complete data)
+  - BigQuery Data Transfer Service (for cloud sources, not on-prem)
+
+**5G Migration with Legacy Integration:**
+- **Requirement**: Integrate new 5G real-time data with legacy maintenance port downloads
+- **Solution**: Cloud Composer (Managed Airflow)
+- **Why**: Workflow orchestration across cloud and on-premises, schedule/monitor pipelines
+- **Wrong choices**: 
+  - Cloud Interconnect (expensive for field offices)
+  - App Engine (PaaS, requires custom code, not simple)
+  - Cloud Build (for CI/CD, not workflow orchestration)
+
+**Intermittent Connectivity (IoT):**
+- **Requirement**: Real-time ingestion for 20M tractors with intermittent rural cellular
+- **Solution**: Pub/Sub → Dataflow → BigQuery
+- **Why**: 
+  - Pub/Sub buffers messages for up to 7 days (handles intermittent connectivity)
+  - Asynchronous data streams
+  - Dataflow processes and normalizes before BigQuery
+- **Wrong choices**: 
+  - Direct BigQuery streaming (no buffer, data lost if connection drops)
+  - FTP servers (legacy approach, doesn't scale)
+  - Cloud Storage Transfer every 5 minutes (micro-batch, not real-time)
+
+**Long-Term Data Retention (Cost Optimization):**
+- **Requirement**: 7-year retention for regulatory/warranty, only last 30 days frequently accessed
+- **Solution**: Last 30 days in BigQuery → Older data to Cloud Storage → Object Lifecycle Management to Archive class
+- **Why**: 
+  - BigQuery: High-performance for active 30 days
+  - Cloud Storage Archive: Cost-effective for 7-year cold storage
+  - Lifecycle policies: Automatic transition between storage classes
+- **Wrong choices**: 
+  - Partition expiration in BigQuery (deletes data, not exports)
+  - Bigtable with SSDs for 7 years (extremely expensive)
+  - Delete after 30 days (violates 7-year requirement)
+
+**Recommended Architecture Pattern:**
+```
+Vehicles → Pub/Sub → Dataflow → {
+  Cloud Storage (complete data, lifecycle to Archive)
+  BigQuery (aggregated analytics)
+}
+```
+----
+
+### Helicopter Racing League (HRL)
+
+**Company Overview:**
+- Global sports league for competitive helicopter racing
+- Annual world championship and regional league competitions
+- Paid streaming service with live telemetry and predictions
+
+**Solution Concept:**
+- Migrate to new platform for managed AI/ML services for race predictions
+- Move content serving closer to users, especially in emerging regions
+- Expand predictive capabilities during and before races
+
+**Existing Technical Environment:**
+- Public cloud-first company
+- Video recording/editing at race tracks
+- Video encoding/transcoding in cloud (VMs per job)
+- Race predictions using TensorFlow on VMs
+- Content stored in object storage on existing cloud provider
+
+**Business Requirements:**
+- Expose predictive models to partners
+- Increase predictive capabilities: race results, mechanical failures, crowd sentiment
+- Increase telemetry and create additional insights
+- Measure fan engagement with predictions
+- Enhance global availability and broadcast quality
+- Increase concurrent viewers
+- Minimize operational complexity
+- Ensure regulatory compliance
+- Create merchandising revenue stream
+
+**Technical Requirements:**
+- Maintain/increase prediction throughput and accuracy
+- Reduce viewer latency
+- Increase transcoding performance
+- Create real-time analytics of viewer consumption patterns
+- Create data mart for processing large volumes of race data
+
+**Key Exam Questions & Patterns:**
+
+**Content Migration & Serving:**
+- **Requirement**: Migrate videos from another provider without service interruption, users access via secure procedure
+- **Solutions**:
+  1. Cloud CDN with Internet Network Endpoint Group (NEG)
+  2. Apigee for API management
+  3. Cloud Storage Transfer Service for migration
+- **Why**: 
+  - Cloud CDN with custom origins: Serve from external backends (other cloud), mask content URL
+  - Apigee: Manage services across GCP, on-prem, multi-cloud
+  - Storage Transfer Service: Large-scale online data transfer (10s of Gbps)
+- **Wrong choices**: 
+  - Cloud Function to fetch video (complicated, requires code, won't scale)
+  - Cloud Storage streaming service (for on-the-fly data, not migration)
+  - Transfer Appliance (for local physical data, not cloud-to-cloud)
+
+**API Monetization & Revenue Stream:**
+- **Requirement**: Service subscriptions, monetization, pay-as-use, rate-limiting for merchandising revenue
+- **Solution**: Apigee
+- **Why**: Top GCP product for API management with monetization, traffic control, throttling, security, hybrid integration
+- **API Management Options**:
+  - Apigee: Full-featured (monetization, hybrid, throttling)
+  - Cloud Endpoints: GCP-only, no monetization
+  - API Gateway: Serverless workloads only
+- **Wrong choices**: 
+  - Cloud Endpoints (no monetization or hybrid support)
+  - Cloud Tasks (thread management, not API management)
+  - Cloud Billing (GCP services accounting, not end-user services)
+
+**ML Model Development & MLOps:**
+- **Requirements**: 
+  - Create experimental forecast models with minimal code
+  - Develop highly customized models with open-source frameworks
+  - Integrate teamwork and optimize MLOps processes
+  - Serve models in optimized environment
+- **Solution**: Vertex AI
+- **Why**: 
+  - AutoML Video: Experimental models with minimal/no code, external data support
+  - Build/deploy models with many open-source frameworks
+  - Support continuous modeling with TensorFlow Extended and Kubeflow Pipelines
+  - Feature engineering, hyperparameter tuning, model serving, model understanding
+  - Integrates multiple ML tools, improves MLOps pipelines
+- **Other Valid Tools**:
+  - Video Intelligence API
+  - TensorFlow Enterprise and Kubeflow for customized models
+  - BigQuery ML
+
+**Live Video Analysis:**
+- **Requirement**: Live playback with live annotations, immediately accessible without coding
+- **Solutions**:
+  1. HLS (HTTP Live Streaming) protocol
+  2. Video Intelligence API Streaming API
+- **Why**: 
+  - HLS: Apple technology for live and on-demand audio/video to broad range of devices
+  - Video Intelligence Streaming API: Analyze live media and get metadata using AIStreamer
+- **Wrong choices**: 
+  - HTTP protocol alone (can't manage live streaming)
+  - Dataflow (manages pipelines but can't derive metadata from binary without custom code)
+  - Pub/Sub (ingests metadata but doesn't analyze video)
+
+**Content Architecture Pattern:**
+```
+Race Tracks (Video) → {
+  Live: HLS Protocol → Cloud CDN → Global Viewers
+  Recorded: Cloud Storage → Transfer Service (migration) → Cloud CDN
+  Analysis: Video Intelligence API → Metadata → BigQuery
+  Predictions: Vertex AI → TensorFlow/Kubeflow
+}
+```
+
+------
+
+### Mountkirk Games
+
+**Company Overview:**
+- Makes online, session-based, multiplayer games for mobile platforms
+- Expanding to other platforms after successful GCP migration
+- Building retro-style FPS game with hundreds of simultaneous players
+- Real-time global leaderboard across all active arenas
+
+**Solution Concept:**
+- Deploy game backend on GKE for rapid scaling
+- Use Google's global load balancer to route players to closest regional arenas
+- Multi-region Spanner cluster for global leaderboard sync
+
+**Existing Technical Environment:**
+- Recently migrated to Google Cloud
+- 5 games migrated using lift-and-shift VM migrations
+- Each game in isolated project under folder (maintains permissions/network policies)
+- Legacy low-traffic games consolidated into single project
+- Separate environments for development and testing
+
+**Business Requirements:**
+- Support multiple gaming platforms
+- Support multiple regions
+- Support rapid iteration of game features
+- Minimize latency
+- Optimize for dynamic scaling
+- Use managed services and pooled resources
+- Minimize costs
+
+**Technical Requirements:**
+- Dynamically scale based on game activity
+- Publish scoring data on near real-time global leaderboard
+- Store game activity logs in structured files for future analysis
+- Use GPU processing to render graphics server-side for multi-platform support
+- Support eventual migration of legacy games to new platform
+
+**Key Exam Questions & Patterns:**
+
+**Telemetry Analysis System:**
+- **Requirement**: Improve game and infrastructure, minimize effort, maximize flexibility, real-time analysis
+- **Solution**: Pub/Sub → Dataflow → BigQuery
+- **Why**: 
+  - Pub/Sub: Ingests messages from user devices and game servers
+  - Dataflow: Transform data in schema-based format, process in real-time
+  - BigQuery: Perform analytics
+- **Wrong choices**: 
+  - Pub/Sub + Bigtable (Bigtable not for real-time analytics)
+  - Kubeflow (for ML pipelines, not general telemetry analysis)
+  - Pub/Sub + Cloud Spanner (Spanner is global SQL DB, not analytics tool)
+
+**Kubernetes Security & Identity:**
+- **Requirement**: Use open platform (cloud-native, no vendor lock-in) but access GCP APIs securely with Google-recommended practices
+- **Solution**: Workload Identity
+- **Why**: 
+  - Preferred way for GKE workloads to access GCP APIs
+  - Configure Kubernetes service account to authenticate as GCP service account
+  - Standard, secure, easy identity management
+  - Recommended approach for GKE applications
+- **Important Distinction**:
+  - **Workload Identity**: For GKE pods accessing GCP services (CORRECT for this case)
+  - **Workload Identity Federation**: For external IdPs (AWS, Azure, OIDC providers)
+- **Wrong choices**: 
+  - API keys (minimal security, no authorization)
+  - Service Accounts alone (GCP-proprietary, Kubernetes uses K8s service accounts)
+  - Workload Identity Federation (for external IdPs like AWS/Azure, not GKE)
+
+**Architecture Pattern:**
+```
+Players → Global Load Balancer → Regional GKE Clusters (Game Servers)
+                                         ↓
+Game Events → Pub/Sub → Dataflow → BigQuery (Analytics)
+                                         ↓
+Scoring Data → Multi-Region Cloud Spanner (Global Leaderboard)
+Server-side Rendering → GPU-enabled node pools
+```
+
+**Key Concepts:**
+- **Workload Identity** vs **Workload Identity Federation**:
+  - WI: GKE pods → GCP APIs (use K8s service accounts)
+  - WI Federation: External IdPs (AWS, Azure) → GCP APIs
+- **Multi-Region Spanner**: Global consistency for leaderboard sync across regions
+- **GKE with GPU node pools**: Server-side rendering for multi-platform support
+- **Managed services**: GKE (not self-managed K8s), Cloud Spanner (not self-hosted DB)
 
 ---
 

@@ -1,3 +1,5 @@
+# [TO BE FIXED ALIGNMENT MESSED UP NOTES]
+
 # GCP Professional Cloud Architect - Study Notes
 
 Below are the three deliverables you asked for (services table, tradeoffs table, and the 4 case studies with requirements + current infra pulled from the official case-study PDFs, plus the proposed technical solution bullets from your course slides). Case studies are ~25% of the PCA exam questions.

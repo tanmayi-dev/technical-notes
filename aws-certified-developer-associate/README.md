@@ -1977,3 +1977,629 @@ From the text document — **frequently confused in exam questions**:
 
 > **🏆 Good luck on your exam! Read every question fully, eliminate wrong answers, and trust your preparation.**
 > *If you don't know — guess. No penalty for wrong answers!*
+
+---
+
+## 29. More Practice Question Insights (Batch 2)
+
+> Real exam-style questions — patterns you MUST recognise.
+
+---
+
+### 🔑 Q18 — Reserved Instance Billing When You Over-Use
+
+**Question:** 1 Reserved Instance purchased, 3 m4.xlarge running concurrently for 1 hour. How are they charged?
+
+**Answer:** ✅ **1 instance at Reserved rate + 2 instances at On-Demand rate**
+
+| Instances Running | Reserved Purchased | Billing |
+|---|---|---|
+| 3 | 1 | 1 × Reserved + 2 × On-Demand |
+| 1 | 3 | 1 × Reserved (other 2 reserved slots unused — still pay for them) |
+| 3 | 3 | All 3 × Reserved |
+
+> ⚠️ **Gotcha:** Reserved Instances are a **billing discount**, not a capacity reservation. You only get the discount for the number you purchased. Extra instances beyond your RI count are billed at On-Demand rates. You are NOT billed for all 3 at Reserved rate just because you have an RI.
+
+---
+
+### 🔑 Q17 — CloudFront Signed URL vs Signed Cookies
+
+**Question:** Share a single research paper securely with a global team without compromising security.
+
+**Answer:** ✅ **CloudFront Signed URL**
+
+**Decision rule — when to use which:**
+
+| Use Case | Method |
+|---|---|
+| **Single file** download (one research paper, one video) | **Signed URL** ✅ |
+| **Multiple files** (subscriber website, entire content library) | **Signed Cookies** |
+| **RTMP distribution** | **Signed URL** only |
+| When you can't change application URLs | **Signed Cookies** |
+| App doesn't support cookies | **Signed URL** |
+
+**Why NOT the others:**
+- **Signed Cookies** = multiple files / subscriber access, not a single file
+- **Field-Level Encryption** = protects specific POST fields (e.g., credit card numbers in forms), not file access
+- **WAF** = protects against web attacks (SQL injection, XSS), not content access control
+
+**CloudFront Signed URL key facts:**
+- Public key stored with CloudFront; **private key used to sign** the URL portion
+- Signed URLs can be created using **trusted key groups** (recommended) OR **CloudFront key pairs** (root account only)
+- Both trusted key groups and CloudFront key pairs are manageable via CloudFront APIs
+
+---
+
+### 🔑 Q20 — DynamoDB ConsistentRead — Which Operation?
+
+**Question:** High-frequency trading app — multiple trades updating the same item. Ensure the latest value is always read.
+
+**Answer:** ✅ **`ConsistentRead = true` while doing `GetItem`**
+
+**Why the others are wrong:**
+| Option | Why Wrong |
+|---|---|
+| `ConsistentRead = true` on `PutItem` | PutItem is a **write** operation — `ConsistentRead` parameter doesn't exist on writes |
+| `ConsistentRead = true` on `UpdateItem` | Same — writes don't have ConsistentRead |
+| `ConsistentRead = false` on `PutItem` | Doubly wrong — false = eventually consistent, and PutItem is a write |
+
+> ⚠️ **Gotcha:** `ConsistentRead` only applies to **read operations**: `GetItem`, `Query`, `Scan`, `BatchGetItem`. It does NOT apply to write operations (`PutItem`, `UpdateItem`, `DeleteItem`).
+
+---
+
+### 🔑 Q21 — ASG Hard Cap at Maximum Capacity
+
+**Question:** ASG max=3, current=2, scaling policy says add 3. What happens?
+
+**Answer:** ✅ **ASG adds only 1 instance** (reaches max of 3)
+
+```
+Current capacity:  2
+Policy says add:  +3
+Would become:      5
+Hard max cap:      3
+Actual added:      1   (2 → 3, stops at max)
+```
+
+> ⚠️ **Gotcha:** ASG **never exceeds its maximum capacity**. It adds as many as it can up to the max, then stops. It does NOT add the full policy amount and then scale back down. The scaling action is capped, not executed-then-reversed.
+
+---
+
+### 🔑 Q22 — gp2 EBS Volume: Max IOPS Threshold
+
+**Question:** At which gp2 volume size does the test environment hit max IOPS?
+
+**Answer:** ✅ **5.3 TiB**
+
+**gp2 IOPS formula:**
+```
+gp2 IOPS = 3 × volume_size_in_GB
+Max gp2 IOPS = 16,000
+
+Volume size to hit max IOPS:
+16,000 ÷ 3 = 5,333 GB ≈ 5.3 TiB
+```
+
+**EBS Volume Type IOPS Quick Reference:**
+
+| Type | IOPS per GB | Max IOPS | Max Size | Max IOPS reached at |
+|---|---|---|---|---|
+| gp2 | 3 IOPS/GB | 16,000 | 16 TiB | **5.3 TiB** |
+| gp3 | Configurable | 16,000 | 16 TiB | Configurable (independent) |
+| io1 | Up to 50:1 ratio | 64,000 (Nitro) / 32,000 | 16 TiB | 1,280 GiB for max |
+| st1 (HDD) | Throughput-based | 500 MB/s | 16 TiB | N/A |
+| sc1 (HDD) | Throughput-based | 250 MB/s | 16 TiB | N/A |
+
+> ⚠️ **Gotcha:** 16 TiB is the **max size** of a gp2 volume, NOT where max IOPS is reached. Max IOPS is reached much earlier at **5.3 TiB**.
+
+---
+
+### 🔑 Q50 — io1 EBS: Max IOPS:GiB Ratio Rule
+
+**Question:** Which io1 configuration for a 200 GiB volume is INVALID?
+
+**Answer:** ✅ **200 GiB with 15,000 IOPS is INVALID**
+
+**io1 IOPS:GiB ratio = max 50:1**
+```
+200 GiB × 50 = 10,000 IOPS max for 200 GiB
+15,000 IOPS > 10,000 IOPS → INVALID ❌
+10,000 IOPS → valid ✅
+5,000 IOPS  → valid ✅
+2,000 IOPS  → valid ✅
+```
+
+**io1 Volume Key Facts:**
+- Size: **4 GiB to 16 TiB**
+- IOPS: **100 to 64,000** (Nitro instances) / **32,000** (other instances)
+- **Max ratio: 50:1 (IOPS:GiB)**
+- Formula: `Max IOPS for volume = volume_size_GiB × 50`
+- To get 64,000 IOPS: need at least **1,280 GiB** (1,280 × 50 = 64,000)
+
+> ⚠️ **Exam Trap:** Always apply the **50:1 ratio rule** first. If IOPS ÷ GiB > 50 → the configuration is INVALID.
+
+---
+
+### 🔑 Q25 — CloudFront Signed URL Signers (Multi-Select)
+
+**Correct statements about CloudFront signed URL signers:**
+1. ✅ **Public key is stored with CloudFront; private key is used to sign a portion of the URL**
+2. ✅ **Both trusted key groups and CloudFront key pairs can be managed using CloudFront APIs**
+
+**Incorrect statement:**
+- ❌ "CloudFront key pairs can be created with any account that has admin permissions" — **WRONG**. CloudFront key pairs can **only be created by the root account** (AWS account root user), NOT by IAM users even with admin permissions.
+
+> ⚠️ **Gotcha:** Creating CloudFront key pairs is one of the few things that **requires the root account**. AWS now recommends using **trusted key groups** (managed via IAM) instead of root-account CloudFront key pairs.
+
+---
+
+### 🔑 Q27 — AppSync: Offline Sync Across Devices
+
+**Question:** Mobile app (Android + iOS + Web), offline changes sync when back online. Which service?
+
+**Answer:** ✅ **AWS AppSync**
+
+**Why NOT the others:**
+| Option | Why Wrong |
+|---|---|
+| Elastic Beanstalk | Web app hosting platform — no offline sync capability |
+| Cognito User Pools | Authentication/user registry — no data sync |
+| Cognito Identity Pools | AWS credential vending — no data sync |
+
+**AppSync trigger words:**
+- "offline and sync when back online"
+- "synchronize data across devices"
+- "GraphQL"
+- "real-time collaboration"
+- "cross-device data"
+
+---
+
+### 🔑 Q28 — DynamoDB Upsert: Minimum IAM Permissions
+
+**Question:** Lambda does an **upsert** (get item, update if exists, create if not). Minimum IAM permissions?
+
+**Answer:** ✅ **`dynamodb:UpdateItem` + `dynamodb:GetItem`**
+
+**Why:**
+- `GetItem` → retrieve the item first
+- `UpdateItem` → update existing OR **create item if it doesn't exist** (UpdateItem handles both update and insert in DynamoDB)
+
+**Why NOT the others:**
+| Wrong Option | Why Wrong |
+|---|---|
+| `dynamodb:GetRecords` + PutItem + UpdateTable | `GetRecords` = DynamoDB **Streams** (not table reads!); UpdateTable = schema changes |
+| `dynamodb:AddItem` + GetItem | `AddItem` **does not exist** as a DynamoDB API action |
+| `dynamodb:UpdateItem` + GetItem + PutItem | PutItem is unnecessary — UpdateItem already handles create-if-not-exists |
+
+> ⚠️ **Gotcha:** `UpdateItem` can create an item if it doesn't exist — you do NOT need `PutItem` for an upsert. `GetRecords` is for **DynamoDB Streams**, not regular table reads. `AddItem` is not a real DynamoDB API.
+
+**DynamoDB IAM Action → API mapping (commonly confused):**
+
+| IAM Action | What It Does |
+|---|---|
+| `dynamodb:GetItem` | Read single item |
+| `dynamodb:PutItem` | Write/replace item (full item required) |
+| `dynamodb:UpdateItem` | Modify attributes OR create if not exists |
+| `dynamodb:DeleteItem` | Delete item |
+| `dynamodb:GetRecords` | Read from **DynamoDB Streams** (NOT table) |
+| `dynamodb:UpdateTable` | Modify table schema/capacity (NOT item operations) |
+
+---
+
+### 🔑 Q29 — Cognito User Pools for Sign-Up Management
+
+**Question:** Mobile app, simplify user sign-up, fully managed, scalable, least development effort.
+
+**Answer:** ✅ **Cognito User Pools**
+
+**Why NOT Identity Pools:** Identity Pools grant AWS resource access (STS credentials) — they don't manage sign-up/sign-in.
+
+**Why NOT custom Lambda + DynamoDB / EC2 + DynamoDB:** More development effort, not fully managed — exam always picks managed services for "least effort" questions.
+
+**Sign-up / user management trigger words → Cognito User Pools:**
+- "user registration", "sign up", "sign in", "password reset"
+- "user management", "MFA", "email verification"
+- "social login for user auth" (User Pool with federation)
+- "fully managed user directory"
+
+---
+
+### 🔑 Q32 — SAM Transform Section Meaning
+
+**Question:** YAML document starts with `Transform: 'AWS::Serverless-2016-10-31'`. What does Transform indicate?
+
+**Answer:** ✅ **Presence of Transform indicates it is a SAM template**
+
+> The `Transform` section tells CloudFormation to process the template using the SAM macro, converting SAM-specific resource types (`AWS::Serverless::Function` etc.) into standard CloudFormation resources.
+
+**Why NOT the others:**
+- **CloudFormation Parameter** = `Parameters` section (runtime input values)
+- **Lambda function definition** = `AWS::Lambda::Function` or `AWS::Serverless::Function` resource
+- **Intrinsic function** = `!Ref`, `!GetAtt`, `!Sub`, etc. — used inside templates
+
+---
+
+### 🔑 Q33 — Lambda + Large Data Encryption (>1MB)
+
+**Question:** Lambda Java functions need to encrypt/decrypt >1MB data at runtime. Which method?
+
+**Answer:** ✅ **Envelope Encryption and reference the data as a file within the code**
+
+**Why NOT the others:**
+| Option | Why Wrong |
+|---|---|
+| KMS direct encryption and store as file | KMS `Encrypt` API has **4 KB hard limit** — cannot encrypt 1MB directly |
+| KMS Encryption + store as environment variable | (1) 4KB KMS limit + (2) Lambda env vars max 4KB total |
+| Envelope Encryption + store as environment variable | Env vars max 4KB — cannot store 1MB data or even the encrypted blob |
+
+**The correct pattern:**
+```
+1. Call GenerateDataKey → get plaintext data key
+2. Encrypt the 1MB data locally with data key (no size limit)
+3. Store encrypted data as a FILE (in /tmp or S3)
+4. Reference the file path in code
+5. Encrypted data key stored alongside the file
+```
+
+> ⚠️ **Double Gotcha:**
+> 1. KMS `Encrypt` API = **4 KB max** → use Envelope for anything larger
+> 2. Lambda environment variables = **4 KB total** → cannot store large encrypted blobs
+
+---
+
+### 🔑 Q35 — CodeDeploy: Only Tool that Deploys to EC2 AND On-Premises
+
+**Question:** Automate software deployment to both EC2 instances AND on-premises virtual servers.
+
+**Answer:** ✅ **AWS CodeDeploy**
+
+**Why NOT the others:**
+| Service | Why Wrong |
+|---|---|
+| CodePipeline | **Orchestrator only** — tells CodeDeploy when to run, doesn't deploy itself |
+| Elastic Beanstalk | **Cloud only** — no on-premises support |
+| CodeBuild | **Builds** code into artifacts — doesn't deploy |
+
+> 🔑 **CodeDeploy** is the only AWS service that can deploy to both **cloud (EC2/Lambda/ECS)** AND **on-premises servers**. This is a frequently tested distinction.
+
+---
+
+### 🔑 Q51 — Config Management for ECS: SSM Parameter Store (Confirmed Again)
+
+**Question:** ECS app needs to store/retrieve API auth, URL, and credentials across different environments with minimal code changes.
+
+**Answer:** ✅ **SSM Parameter Store with hierarchical unique paths**
+
+**Why NOT storing in ECS task definition:** Hardcoding credentials in task definitions is a security anti-pattern and requires redeployment to change values.
+
+**Why NOT encrypted files:** Requires file management, decryption logic in code, harder to rotate.
+
+**Why NOT KMS:** KMS manages cryptographic keys, not key-value config pairs.
+
+---
+
+### 📋 New Gotchas Summary from Batch 2
+
+| # | Gotcha |
+|---|---|
+| 41 | **Reserved Instance = billing discount only.** 1 RI + 3 running = 1 RI rate + 2 On-Demand rate |
+| 42 | **ASG never exceeds max capacity** — it adds as many as it can up to max, period |
+| 43 | **gp2 hits max IOPS (16,000) at 5.3 TiB**, not at 16 TiB (max size) |
+| 44 | **io1 max ratio = 50:1 (IOPS:GiB)** — 200 GiB max = 10,000 IOPS |
+| 45 | **`ConsistentRead` only applies to reads** (GetItem, Query, Scan) — NOT to PutItem/UpdateItem |
+| 46 | **CloudFront Signed URL** = single file; **Signed Cookies** = multiple files |
+| 47 | **CloudFront key pairs require the ROOT account** — IAM admin cannot create them |
+| 48 | **`dynamodb:GetRecords`** = DynamoDB Streams — NOT for reading table items |
+| 49 | **`dynamodb:AddItem` does not exist** — use PutItem (full replace) or UpdateItem (partial update) |
+| 50 | **UpdateItem creates item if it doesn't exist** — no need for PutItem in an upsert pattern |
+| 51 | **AppSync** = offline-sync + GraphQL + cross-device data sync |
+| 52 | **Lambda env vars = 4 KB max total** — cannot store large encrypted data in env vars |
+| 53 | **Envelope Encryption + file reference** = correct pattern for >1MB data in Lambda |
+| 54 | **CodeDeploy** is the only service that deploys to both EC2 AND on-premises |
+| 55 | **Transform: AWS::Serverless-2016-10-31** = identifies document as a SAM template |
+
+---
+
+---
+
+## 30. Final Practice Batch — Rapid-Fire Gotchas (Batch 3)
+
+> 17 real exam questions from your latest practice test. Focus on the ⚠️ traps.
+
+---
+
+### 🔑 Q47 — Provisioned vs Reserved Concurrency on a Schedule
+
+**Question:** Lambda traffic spike on Thanksgiving. Prevent cold-start latency.
+
+**Answer:** ✅ **Application Auto Scaling to manage Lambda PROVISIONED concurrency on a schedule**
+
+| Concurrency Type | What it does | Auto Scaling support |
+|---|---|---|
+| **Provisioned** | Pre-warms execution environments → eliminates cold starts | ✅ YES — scheduleable |
+| **Reserved** | Caps max concurrency — a ceiling, not a warm-up | ❌ NO — cannot Auto Scale |
+
+> ⚠️ **Gotcha:** `Reserved` = ceiling (limits max). `Provisioned` = pre-warm (eliminates cold starts). Application Auto Scaling can ONLY manage **Provisioned** concurrency on a schedule.
+
+---
+
+### 🔑 Q46 — Serverless REST API = API Gateway + Lambda
+
+**Question:** Create a REST API using serverless architecture.
+
+**Answer:** ✅ **API Gateway exposing Lambda Functionality**
+
+> 🔑 **Keyword:** "serverless" + "REST API" = **API Gateway + Lambda**, always. Route 53, EC2, ECS, Fargate = NOT serverless REST API.
+
+---
+
+### 🔑 Q43 — CodeBuild Logs → Athena
+
+**Question:** Weekly build reports + failed build log analysis in Athena.
+
+**Answer:** ✅ **Enable S3 and CloudWatch Logs integration for CodeBuild**
+
+- CodeBuild logs go to **S3** and **CloudWatch Logs**
+- Athena queries **S3** directly → logs in S3 = Athena-queryable
+- **CloudTrail** = API calls only (who triggered build), NOT build output logs
+- **EventBridge** = event triggers, NOT log storage
+
+---
+
+### 🔑 Q44 — Zonal vs Regional Reserved Instances
+
+**Question:** Need capacity reservation for critical EC2 instances.
+
+**Answer:** ✅ **Zonal Reserved Instances**
+
+| Feature | Zonal RI | Regional RI |
+|---|---|---|
+| Billing discount | ✅ | ✅ |
+| **Capacity reservation** | ✅ **YES** | ❌ **NO** |
+| AZ flexibility | ❌ Fixed AZ | ✅ Any AZ |
+
+> ⚠️ **Gotcha:** Regional RIs = discount only. Zonal RIs = discount + **actual capacity held**. "Reserve capacity" → **Zonal**.
+
+---
+
+### 🔑 Q38 — Lambda Container Images: Limits and Constraints
+
+**Question:** Package Lambda as container image in ECR. (Select two correct statements)
+
+**Correct:**
+1. ✅ Lambda does NOT support **multi-architecture** container images
+2. ✅ Container image must implement the **Lambda Runtime API**
+
+**Wrong:** ❌ Max size 15 GB — **ACTUAL MAX = 10 GB**
+
+**Lambda container image facts:**
+- Max image size: **10 GB**
+- Must implement **Lambda Runtime API**
+- Architecture: x86_64 OR arm64 — **NOT multi-arch**
+- Stored in **ECR**
+
+---
+
+### 🔑 Q37 — Elastic Beanstalk Auto Configuration
+
+**Question:** Want configuration automatically applied without SSH. How?
+
+**Answer:** ✅ **Include config files in `.ebextensions/` at root of source code**
+
+- Files: `.config` extension, YAML or JSON
+- Location: **root of source bundle**
+- Can configure: ELB, EC2, env vars, packages, files, commands
+
+---
+
+### 🔑 Q (Gift Voucher) — DynamoDB Transactions + RDS Transactions
+
+**Question:** Transfer between two users — all-or-nothing. (Select two)
+
+**Correct:**
+1. ✅ **DynamoDB TransactWriteItems** — all-or-nothing, costs 2× WCU
+2. ✅ **RDS MySQL in a single transaction block**
+
+**Wrong:** ❌ Athena = analytics/query only, NO writes. ❌ Redshift = OLAP warehouse, not operational transactions.
+
+---
+
+### 🔑 Q11 — Cross-Account IAM: Trust Direction
+
+**Question:** EC2 in Account A needs S3 access in Account B.
+
+**Answer:** ✅
+```
+Account B: Create role with S3 access, trust Account A
+Account A: Create instance profile role with sts:AssumeRole to Account B role
+```
+
+**Wrong:** ❌ Creating role in Account A with Account B as trusted entity — **backwards**
+
+> ⚠️ **Golden Rule:** Role always in the **resource-owning account** (B). Trust points to the **consuming account** (A).
+
+---
+
+### 🔑 Q15 — SQS Queue Size
+
+**Question:** Maximum number of messages in an SQS queue?
+
+**Answer:** ✅ **No limit (unlimited)**
+
+**SQS limits that DO exist:**
+- Message **size**: 256 KB (2 GB extended)
+- Message **retention**: 14 days max
+- Per-call receive: 10 messages max
+- **In-flight**: 120,000 Standard / 20,000 FIFO
+
+---
+
+### 🔑 Q16 — API Gateway: What CANNOT Be Used for Auth
+
+**Question:** Which CANNOT be used for API Gateway authentication?
+
+**Answer (CANNOT):** ✅ **AWS STS**
+
+| Auth Method | API Gateway Supports? |
+|---|---|
+| Lambda Authorizer | ✅ YES |
+| IAM roles/policies | ✅ YES |
+| Cognito User Pools | ✅ YES |
+| **AWS STS** | ❌ **NO** |
+
+> ⚠️ STS provides credentials used by IAM auth behind the scenes, but is NOT itself a configurable API Gateway authorizer.
+
+---
+
+### 🔑 Q61 — CloudFormation: Invalid Parameter Type
+
+**Question:** Which is NOT a valid CloudFormation parameter type?
+
+**Answer (INVALID):** ✅ **`DependentParameter`** — does not exist
+
+**Valid CloudFormation parameter types:**
+- `String`, `Number`, `List<Number>`, `CommaDelimitedList`
+- `AWS::EC2::KeyPair::KeyName`, `AWS::EC2::Image::Id`, `AWS::EC2::VPC::Id`
+- `AWS::EC2::Subnet::Id`, `AWS::EC2::SecurityGroup::Id`
+- `AWS::SSM::Parameter::Value<String>`
+
+---
+
+### 🔑 Q62 — SES Throttling Fix
+
+**Question:** SES throws `Throttling - Maximum sending rate exceeded`.
+
+**Answer:** ✅ **Exponential Backoff**
+
+> 🔑 **Universal rule:** ANY AWS throttling error → **Exponential Backoff** first, always. Applies to: SES, SQS, DynamoDB, KMS, Kinesis, API Gateway, etc.
+
+---
+
+### 🔑 Q (Kinesis ProvisionedThroughputExceeded) — Two Fixes
+
+**Question:** KPL producing to Kinesis, getting ProvisionedThroughputExceeded. (Select two)
+
+**Correct:**
+1. ✅ **Retry with exponential backoff**
+2. ✅ **Increase number of shards**
+
+**Wrong:** ❌ Enhanced fan-out — this is for **consumers** (readers), NOT producers
+
+| Solution | Who it helps |
+|---|---|
+| Increase shards | **Producers** (more write capacity) |
+| Enhanced fan-out | **Consumers** (dedicated 2 MB/sec per consumer) |
+
+**Kinesis per-shard limits:**
+- Write: **1,000 records/sec OR 1 MB/sec**
+- Standard read: 5 reads/sec, **2 MB/sec shared**
+- Enhanced fan-out read: **2 MB/sec per consumer** (dedicated)
+
+---
+
+### 🔑 Q64 — DynamoDB Backup: You Cannot Access Native Backup S3
+
+**Question:** Back up DynamoDB to S3 for local download. Which is NOT feasible?
+
+**Answer (NOT feasible):** ✅ **DynamoDB on-demand backup**
+
+> ⚠️ DynamoDB native backup (on-demand + PITR) writes to **AWS-managed S3 buckets you cannot access or download from**.
+
+**To export to YOUR own S3 (downloadable):**
+
+| Method | Notes |
+|---|---|
+| **AWS Data Pipeline** | Easiest one-time backup |
+| **Amazon EMR + Hive** | Best for Spark/Hive power users |
+| **AWS Glue** | Best practice; works with Athena |
+| DynamoDB S3 Export (native) | Newer feature — exports to your S3 bucket |
+
+---
+
+### 🔑 Q65 — X-Ray SDK Bundled But No Data in Console
+
+**Question:** X-Ray SDK bundled into Lambda, but X-Ray console shows nothing.
+
+**Answer:** ✅ **Fix the IAM Role**
+
+**X-Ray setup checklist for Lambda:**
+1. SDK bundled into code ✅ (done in question)
+2. Tracing **enabled** in Lambda config
+3. **IAM execution role** has `xray:PutTraceSegments` + `xray:PutTelemetryRecords`
+   - Managed policy: `AWSXRayDaemonWriteAccess`
+
+> ⚠️ Sampling controls the **percentage** captured — if zero data shows, the problem is permissions (IAM), not sampling. X-Ray works with $LATEST, versions, and aliases — no restriction there.
+
+---
+
+### 🔑 Q1 — Lambda DLQ: When It Triggers
+
+**Question:** When does Lambda send a message to DLQ? (Select two)
+
+**Correct:**
+1. ✅ **Event fails all processing attempts** (all retries exhausted)
+2. ✅ **Lambda invocation is asynchronous** (DLQ only works with async)
+
+**Wrong:** ❌ "Failed once but succeeded later" — success means NO DLQ
+
+**DLQ trigger rules:**
+
+| Scenario | DLQ? |
+|---|---|
+| Async invocation, all retries fail | ✅ YES |
+| Async invocation, eventually succeeds | ❌ NO |
+| Sync invocation (API GW) fails | ❌ NO (error returned to caller) |
+| Event Source Mapping (SQS/Kinesis) fails | ❌ NO (handled by source's own DLQ) |
+
+---
+
+### 🚨 Last-Hour Limits Cheat Sheet
+
+| Service | Item | Value |
+|---|---|---|
+| **Lambda** | Max timeout | 900 sec (15 min) |
+| **Lambda** | /tmp storage | 512 MB |
+| **Lambda** | Default concurrency | 1,000/region |
+| **Lambda** | Container image max | **10 GB** |
+| **Lambda** | Zip direct upload | 50 MB / 250 MB unzipped |
+| **Lambda** | Env vars total | 4 KB |
+| **Lambda** | Max layers | 5 |
+| **Lambda** | DLQ invocation type | **Async only** |
+| **API Gateway** | Max timeout | **30 seconds** |
+| **API Gateway** | Account throttle | 10,000 RPS / 5,000 burst |
+| **API Gateway** | Cache TTL default/max | 300s / 3600s |
+| **SQS** | Message size | 256 KB (2 GB extended) |
+| **SQS** | Retention default/max | 4 days / 14 days |
+| **SQS** | Visibility timeout default/max | 30s / 12 hrs |
+| **SQS** | In-flight Standard/FIFO | 120,000 / 20,000 |
+| **SQS** | Queue message count | **Unlimited** |
+| **SQS FIFO** | Throughput | 300/s (3,000 batched) |
+| **DynamoDB** | Item size | 400 KB |
+| **DynamoDB** | LSI | 5 per table (hard) |
+| **DynamoDB** | GSI | 20 per table (soft) |
+| **DynamoDB** | Streams retention | 24 hours |
+| **EBS gp2** | Max IOPS | 16,000 at **5.3 TiB** |
+| **EBS io1** | IOPS:GiB ratio | **50:1 max** |
+| **EBS io1** | Max IOPS (Nitro) | 64,000 |
+| **S3** | Max object size | 5 TB |
+| **S3** | Multipart mandatory | >4 GB |
+| **S3** | PUT RPS per prefix | 3,500 |
+| **S3** | GET RPS per prefix | 5,500 |
+| **KMS** | Direct encrypt max | **4 KB** |
+| **KMS** | Key deletion wait | 7 days min |
+| **Kinesis** | Per shard write | 1,000 rec/sec or 1 MB/sec |
+| **Kinesis** | Enhanced fan-out | 2 MB/sec **per consumer** |
+| **Kinesis** | Retention default/max | 1 day / 7 days |
+| **CloudFront** | Default TTL | 24 hours |
+| **CloudFormation** | Max outputs | 60 |
+| **Step Functions** | Max duration | 1 year |
+| **EB** | Source bundle max | 512 MB |
+| **RDS** | Default backup | 7 days |
+| **RDS** | Max backup | 35 days |
+| **RDS Aurora** | Max read replicas | 15 |
+
+---
+
+> **🏆 Good luck on your exam! Read every question fully, eliminate wrong answers, and trust your preparation.**
+> *If you don't know — guess. No penalty for wrong answers!*

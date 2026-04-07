@@ -4,39 +4,42 @@
 - They provide you with servers and services that you can use on demand and scale easily
 - Amazon.com and Netflix
 
-**Topics** 
-- Amazon EC2
-- Amazon ECR
-- Amazon ECS
-- AWS Elastic Beanstalk
-- AWS Lambda
-- Elastic Load Balancing
-- Amazon CloudFront
-- Amazon Kinesis
-- Amazon Route 53
-- Amazon S3
-- Amazon RDS
-- Amazon Aurora
-- Amazon DynamoDB
-- Amazon ElasticCache
-- Amazon SQS
-- Amazon SNS
-- AWS Step Functions
-- Auto Scaling
-- Amazon API Gateway
-- Amazon SES
-- Amazon Cognito
-- IAM
-- Amazon CloudWatch
-- Amazon EC2 Systems Manager
-- AWS CloudFormation
-- AWS CloudTrail
-- AWS CodeCommit
-- AWS CodeBuild
-- AWS CodeDeploy
-- AWS CodePipeline
-- AWS X-Ray
-- AWS KMS
+## 📖 Service Quick Definitions
+
+| Service | One-Line Definition |
+|---|---|
+| **Amazon EC2** | Rent virtual servers in the cloud — billed per second, choose size/OS/region; the foundation of AWS compute |
+| **Amazon ECR** | Managed Docker container registry — store, version, and deploy container images; integrates natively with ECS and Lambda |
+| **Amazon ECS** | Fully managed container orchestration — run Docker containers on EC2 or serverless Fargate without managing Kubernetes |
+| **AWS Elastic Beanstalk** | PaaS that auto-handles deployment, scaling, load balancing, and health monitoring — just upload your code |
+| **AWS Lambda** | Serverless compute — run code triggered by events without managing servers; pay per invocation + duration (max 15 min) |
+| **Elastic Load Balancing** | Distributes incoming traffic across multiple targets (EC2, Lambda, containers) for high availability and fault tolerance |
+| **Amazon CloudFront** | Global CDN with 200+ edge locations — caches and delivers content close to users with low latency |
+| **Amazon Kinesis** | Real-time streaming data platform — ingest, process, and analyze continuous data streams at scale |
+| **Amazon Route 53** | Scalable DNS + domain registration + health checks — routes users to the right endpoint using flexible routing policies |
+| **Amazon S3** | Object storage for any file type — unlimited storage, 11 nines durability, accessed via REST API |
+| **Amazon RDS** | Managed relational database — handles backups, patching, Multi-AZ failover, and read replicas for 6 engines |
+| **Amazon Aurora** | AWS-built MySQL/PostgreSQL-compatible DB — 5× faster than MySQL, 6 copies across 3 AZs, up to 15 read replicas |
+| **Amazon DynamoDB** | Fully managed serverless NoSQL key-value + document database — single-digit millisecond performance at any scale |
+| **Amazon ElastiCache** | In-memory caching service (Redis or Memcached) — microsecond responses for frequently accessed hot data |
+| **Amazon SQS** | Managed message queue — decouples producers and consumers; Standard (unlimited TPS) or FIFO (ordered, exactly-once) |
+| **Amazon SNS** | Managed pub/sub messaging — one publisher broadcasts to many subscribers (SQS, Lambda, email, SMS, HTTP) simultaneously |
+| **AWS Step Functions** | Visual serverless workflow orchestrator — chains AWS services into state machines with retry, branching, and parallel steps |
+| **Auto Scaling** | Automatically adjusts EC2 instance count based on demand — uses CloudWatch alarms and scaling policies |
+| **Amazon API Gateway** | Managed API front door — create, publish, secure, and monitor REST, HTTP, and WebSocket APIs at any scale |
+| **Amazon SES** | Managed email sending service — send transactional, marketing, or bulk emails cost-effectively at scale |
+| **Amazon Cognito** | User identity service — User Pools (sign-up/sign-in, JWT tokens) + Identity Pools (temporary AWS credentials via STS) |
+| **IAM** | Identity and Access Management — controls who (users, roles, services) can do what on which AWS resources via JSON policies |
+| **Amazon CloudWatch** | Monitoring and observability — collects metrics, logs, events; triggers alarms; drives auto-scaling actions |
+| **Amazon EC2 Systems Manager** | Operational hub — Parameter Store (config/secrets), patch management, Run Command, and SSH-free Session Manager |
+| **AWS CloudFormation** | Infrastructure as Code — define all AWS resources in JSON/YAML templates; provision and update stacks automatically |
+| **AWS CloudTrail** | Full audit log of all AWS API calls — records who did what, when, and from where; stores in S3 or CloudWatch Logs |
+| **AWS CodeCommit** | Fully managed private Git repository — secure source control hosted on AWS with IAM-based access control |
+| **AWS CodeBuild** | Fully managed build service — compiles code, runs tests, produces deployment artifacts; serverless, no build servers needed |
+| **AWS CodeDeploy** | Automated deployment service — deploys to EC2, on-premises, Lambda, and ECS with Blue/Green and In-Place strategies |
+| **AWS CodePipeline** | CI/CD pipeline orchestrator — automates the full flow from source → build → test → deploy across all DevOps tools |
+| **AWS X-Ray** | Distributed tracing — traces requests across services and AWS functions, identifies bottlenecks, draws service maps |
+| **AWS KMS** | Managed encryption key service — create, rotate, and control cryptographic keys used to encrypt data across all AWS services |
 ---
 
 # 🎯 AWS Certified Developer Associate (DVA-C02) — FINAL EXAM NOTES
